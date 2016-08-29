@@ -75,7 +75,8 @@ class SMSDetector
 
   public:
     // default constructor and destructor
-    SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x = 100, int n_cells_y = 100, double tempK = 253., double trapping = 9e300, double fluence = 0.0, std::vector<double> neff_param = {0}, std::string neff_type = "Trilinear");
+    SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x = 100, int n_cells_y = 100, double tempK = 253.,
+    		double trapping = 9e300, double fluence = 0.0, std::vector<double> neff_param = {0}, std::string neff_type = "Trilinear");
     ~SMSDetector();
     // set methods
     void set_voltages(double v_bias, double v_depletion);

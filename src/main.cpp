@@ -17,12 +17,14 @@
 
 // Declaring external convolution function and threaded function
 extern TH1D *H1DConvolution( TH1D *htct , Double_t Cend=0. , int tid=0) ; 
-void call_from_thread(CarrierCollection & cCollection, double dt, double max_time, double shift_x, double y_shifts, std::vector<double> curr_elec, std::vector<double> curr_hole, int thr_id);
+void call_from_thread(CarrierCollection & cCollection, double dt, double max_time, double shift_x, double y_shifts,
+		std::vector<double> curr_elec, std::vector<double> curr_hole, int thr_id);
 
 //------------
 
 // Threaded function to call carrier_collection
-void call_from_thread(CarrierCollection & cCollection, double dt, double max_time, double shift_x, double y_shifts, std::vector<double> curr_elec, std::vector<double> curr_hole, int id)
+void call_from_thread(CarrierCollection & cCollection, double dt, double max_time, double shift_x, double y_shifts,
+		std::vector<double> curr_elec, std::vector<double> curr_hole, int id)
 {
 	int nTimeSteps = curr_elec.size();
 	std::valarray<double> i_elec((size_t) nTimeSteps);	
@@ -77,7 +79,8 @@ int main()
 	std::vector<double> neff_param(8,0.);
 
 	std::string file_carriers = "etct.carriers";
-	utilities::parse_config_file("Config.TRACS", file_carriers, depth, width,  pitch, nns, temp, trapping, fluence, nThreads, n_cells_x, n_cells_y, bulk_type, implant_type, waveLength, scanType, C, dt, max_time, vInit, deltaV, vMax, v_depletion, zInit, zMax, deltaZ, yInit, yMax, deltaY, neff_param, neffType);
+	utilities::parse_config_file("Config.TRACS", file_carriers, depth, width,  pitch, nns, temp, trapping, fluence, nThreads, n_cells_x, n_cells_y, bulk_type,
+			implant_type, waveLength, scanType, C, dt, max_time, vInit, deltaV, vMax, v_depletion, zInit, zMax, deltaZ, yInit, yMax, deltaY, neff_param, neffType);
 	
 	// Create vector of (n-1) threads as the nth thread is the main thread
 	std::thread t[nThreads-1];
@@ -145,12 +148,12 @@ int main()
 	std::vector<double>  y_shifts(n_ySteps+1) ; // laser shift in X axis to center laser focus over read-out strip
 	std::vector<double>  voltages(n_vSteps+1);
 
-	// Creat voltages
+	// Create voltages
 	for (int i = 0; i < n_vSteps + 1; i++ ) 
 	{
 		voltages[i] = (i*deltaV)+vInit;
 	}
-	// Creat shifts in Z
+	// Create shifts in Z
 	for (int i = 0; i < n_zSteps + 1; i++ ) 
 	{
 		z_shifts[i] = (i*deltaZ)+zInit;
@@ -209,7 +212,8 @@ int main()
 			// Loop on depth
 			for (int i = 0; i < n_zSteps + 1; i++) 
 			{
-				std::cout << "Height " << z_shifts[i] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[l] << " of " << y_shifts.back() << " || Voltage " << voltages[k] << " of " << voltages.back() << std::endl;
+				std::cout << "Height " << z_shifts[i] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[l] << " of " << y_shifts.back() <<
+						" || Voltage " << voltages[k] << " of " << voltages.back() << std::endl;
 
 				i_total= 0;
 
