@@ -11,8 +11,9 @@
  * silicon detectors simulation.
  *
  */
- std::mutex mtx2;           // mutex for critical section
-//extern const int num_threads;
+
+std::mutex mtx2;
+
 TRACSInterface::TRACSInterface(std::string filename)
 {
 	neff_param = std::vector<double>(8,0);
@@ -43,7 +44,6 @@ TRACSInterface::TRACSInterface(std::string filename)
 		}
 	n_zSteps_array = (int) std::floor ((n_zSteps+1) / num_threads);
 	n_zSteps_iter = (int) std::round ((n_zSteps+1) / (num_threads)*1.0);
-	//n_balance = (int)(((n_zSteps+1) / (num_threads+1.0)-n_zSteps_array)*n_zSteps_array*10;
 	n_vSteps = (int) std::floor((vMax-vInit)/deltaV);
 	n_ySteps = (int) std::floor((yMax-yInit)/deltaY);
 	//WRITING TO FILES!
@@ -75,10 +75,6 @@ TRACSInterface::TRACSInterface(std::string filename)
 	i_elec.resize((size_t) n_tSteps);
 	i_hole.resize ((size_t) n_tSteps);
 	i_total.resize((size_t) n_tSteps);
-
-	i_elec = 0;
-	i_hole = 0;
-	i_total = 0;
 
 	z_shifts.resize((size_t) n_zSteps+1,0.);
 	z_shifts1.resize((size_t) n_zSteps1+1,0.);
@@ -121,8 +117,6 @@ TRACSInterface::TRACSInterface(std::string filename)
 			}
 		}
 		
-	
-
 	// Create shifts in Y
 	for (int i = 0; i < n_ySteps + 1; i++ ) 
 	{
@@ -131,35 +125,6 @@ TRACSInterface::TRACSInterface(std::string filename)
 
 	vBias = vInit;
 	set_tcount(0);
-	/*detector->set_voltages(vBias, vDepletion);
-	detector->solve_w_u();
-	detector->solve_d_u();
-	detector->solve_w_f_grad();
-	detector->solve_d_f_grad();
-	detector->get_mesh()->bounding_box_tree();
-	*/
-	//i_ramo  = new TH1D("ramo","Ramo current",n_tSteps, 0.0, max_time);
-	//i_conv   = new TH1D("conv","Amplifier convoluted",n_tSteps, 0.0, max_time);
-
-	// Convert Z to milimeters
-/*	std::vector<double> z_chifs(n_zSteps+1);
-	z_chifs = z_shifts;
-	std::transform(z_chifs.begin(), z_chifs.end(), z_chifs.begin(), std::bind1st(std::multiplies<double>(),(1./1000.)));
-	
-	// Convert Z to milimeters
-	std::vector<double> y_chifs(n_ySteps+1);
-	y_chifs = y_shifts;
-	std::transform(y_chifs.begin(), y_chifs.end(), y_chifs.begin(), std::bind1st(std::multiplies<double>(),(1./1000.)));
-*/
-
-	// filename for data analysis
-/*	hetct_conv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_conv.hetct";
-	hetct_noconv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_noconv.hetct";
-	
-	// write header for data analysis
-	utilities::write_to_hetct_header(hetct_conv_filename, detector, C, dt, y_chifs, z_chifs, waveLength, scanType, carrierFile, voltages);
-	utilities::write_to_hetct_header(hetct_noconv_filename, detector, C, dt, y_chifs, z_chifs, waveLength, scanType, carrierFile, voltages);
-*/
 	
 	i_ramo  = NULL;
 	i_rc    = NULL;
@@ -170,7 +135,11 @@ TRACSInterface::TRACSInterface(std::string filename)
 // Destructor
 TRACSInterface::~TRACSInterface()
 {
-//	delete i_ramo, i_rc, i_conv;
+ //delete[] i_ramo;
+ //delete[] i_rc;
+ //delete[] i_conv;
+ //delete[] carrierCollection;
+ //delete[] detector;
 }
 
 /*
@@ -382,10 +351,6 @@ void TRACSInterface::calculate_fields()
 	detector->solve_w_f_grad();
 	detector->solve_d_f_grad();
 	detector->get_mesh()->bounding_box_tree();
-	//detector->solve_d_f_grad();
-	//detector->solve_d_u();
-	
-	
 	
 }
 
@@ -401,7 +366,6 @@ void TRACSInterface::set_neffType(std::string newParametrization)
 
 }
 
-
 /*
  * Allows the user to select a new carrier distribution from a file that
  * complies with the TRACS format. 
@@ -411,7 +375,6 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
 	QString carrierFileName = QString::fromUtf8(newCarrFile.c_str());
 	carrierCollection->add_carriers_from_file(carrierFileName);
 }
-
 
 /*
  * Returns the pointer
@@ -429,6 +392,7 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
  */
   void TRACSInterface::loop_on(int tid)
  {
+
  	params[0] = 0; //zPos 
  	params[1] = 0; //yPos;
  	params[2] = 0; //vPos;
@@ -460,29 +424,12 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
 								i_conv = GetItConv();
 								i_conv_array[tid][params[0]] = i_conv; // for output
 								mtx2.unlock();
-								//write to file
-								//mtx2.lock();
-								//utilities::write_to_file_row(hetct_conv_filename, i_conv, detector->get_temperature(), y_shifts[params[1]], z_shifts_array[tid][params[0]], voltages[params[2]]);
-								//utilities::write_to_file_row(hetct_noconv_filename, i_ramo, detector->get_temperature(), y_shifts[params[1]], z_shifts_array[tid][params[0]], voltages[params[2]]);
-								//mtx2.unlock();
+
 							}
 						}
-						//std::string root_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_"+voltage+"V_"+neigh+"nns_"+scanType+".root";
-						 // std::string hetct_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+".hetct";
 
-						// Open a ROOT file to save result
-						//TFile *tfile = new TFile(root_filename.c_str(), "RECREATE" );
-						//i_ramo->Write();
-						//i_rc->Write();
-						//tfile->Close();
 	 		 		}
- 	
-	 		 	
- 	/*if(error)
- 		{
- 			std::cout<<"Error in loop_on(str1, str2, str3), invalid input arguments! Use (\"z\", \"y\", \"v\")!" << std::endl;
- 		}
-	 */	
+
  	n_par0 = 0;
  	n_par1 = 0;
  	n_par2 = 0;
@@ -574,14 +521,7 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
 
 							}
 						}
-						//std::string root_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_"+voltage+"V_"+neigh+"nns_"+scanType+".root";
-						 // std::string hetct_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+".hetct";
 
-						// Open a ROOT file to save result
-						//TFile *tfile = new TFile(root_filename.c_str(), "RECREATE" );
-						//i_ramo->Write();
-						//i_rc->Write();
-						//tfile->Close();
 	 		 		}
 
     }
