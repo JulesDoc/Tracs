@@ -30,7 +30,7 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 	i_ramo_array.clear();
 
 	detector = new SMSDetector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
-	detector->set_voltages(vInit, vDepletion);
+	//detector->set_voltages(vInit, vDepletion);
 	//detector->solve_w_u();
 	//carrierCollection = new CarrierCollection(detector);
 	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
@@ -149,11 +149,11 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 
 	//calculating fields
 
-	detector->solve_w_u();
-	detector->solve_d_u();
-	detector->solve_w_f_grad();
-	detector->solve_d_f_grad();
-	detector->get_mesh()->bounding_box_tree();
+	//detector->solve_w_u();
+	//detector->solve_d_u();
+	//detector->solve_w_f_grad();
+	//detector->solve_d_f_grad();
+	//detector->get_mesh()->bounding_box_tree();
 
 	// Convert Z to milimeters
 	std::vector<double> z_chifs(n_zSteps+1);

@@ -35,19 +35,19 @@ private:
 
 	uint threadIndex;
 	// Declaring external convolution function
-	double pitch;
-	double width;
-	double depth;
-	double temp;
-	double trapping;
-	double fluence;
+	double pitch_;
+	double width_;
+	double depth_;
+	double temp_;
+	double trapping_;
+	double fluence_;
 	double capacitance;
 	double dt;
 	double max_time;
 	double vInit; //added v
 	double deltaV;
 	double vMax;
-	double v_depletion;
+	double v_depletion_;
 	double deltaZ;
 	double zInit;
 	double zMax;
@@ -55,14 +55,14 @@ private:
 	double yMax; //((2*nns)+1)*pitch,
 	double deltaY; //added ^
 	double vBias;
-	double vDepletion;
+	//double vDepletion;
 	double zPos;
 	double yPos;
 
 	int nThreads_;
-	int nns;
-	int n_cells_y;
-	int n_cells_x;
+	int nns_;
+	int n_cells_y_;
+	int n_cells_x_;
 	int n_tSteps;
 	int waveLength; //added v
 	int n_vSteps;
@@ -78,13 +78,13 @@ private:
 	int tcount;
 	int count1, count2, count3;
 
-	char bulk_type;
-	char implant_type;
+	char bulk_type_;
+	char implant_type_;
 
 	vector<vector <TH1D *> >  i_ramo_array, i_conv_array, i_rc_array;
 	//vector<vector <TH1D*> >  i_ramo_array, i_conv_array, i_rc_array;
 
-	std::vector<double> neff_param = {0};
+	std::vector<double> neff_param_ = {0};
 	std::valarray<double> i_total;
 	std::valarray<double> i_elec;
 	std::valarray<double> i_hole;
@@ -95,11 +95,11 @@ private:
 	//double z_shifts_array[10][10];
 	std::vector<double>  z_shifts1, z_shifts2;
 	std::vector<double>  y_shifts; // laser shift in X axis to center laser focus over read-out strip
-	std::vector<double>  voltages;
+	std::vector<double>  voltages_;
 
 
 	std::string carrierFile;
-	std::string neffType;
+	std::string neffType_;
 	std::string scanType;
 
 	//file naming
@@ -148,7 +148,7 @@ public:
 			const std::string &scanType, const double capacitance, const double dt, const double max_time, const double vInit, const double deltaV, const double vMax,
 			const double vDepletion, const double zInit, const double zMax, const double deltaZ, const double yInit, const double yMax, const double deltaY,
 			const std::vector<double> neff_param, const std::string neffType, const int n_par0, const int n_par1, const int n_par2, const int count1, const int count2,
-			const int count3, const double zPos, const double v_depletion, const double yPos, const int &tcount, const int n_balance,
+			const int count3, const double zPos, const double yPos, const int &tcount, const int n_balance,
 			const std::string hetct_conv_filename, const std::string hetct_noconv_filename, const std::string hetct_rc_filename); // Reads values, initializes detector
 
 	// Destructor

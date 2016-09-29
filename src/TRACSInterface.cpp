@@ -1,5 +1,9 @@
 #include "TRACSInterface.h"
 #include "AExecutable.h"
+#include <iostream>
+#include <chrono>
+#include <ratio>
+#include <thread>
 #include <mutex>          // std::mutex
 /*
  * Constructor of class TRACSInterface
@@ -28,21 +32,29 @@ TRACSInterface::TRACSInterface(const uint threadIndex, const vector<vector <TH1D
 		const std::string &scanType, const double capacitance, const double dt, const double max_time, const double vInit, const double deltaV, const double vMax,
 		const double vDepletion, const double zInit, const double zMax, const double deltaZ, const double yInit, const double yMax, const double deltaY,
 		const std::vector<double> neff_param, const std::string neffType, const int n_par0, const int n_par1, const int n_par2, const int count1, const int count2,
-		const int count3, const double zPos, const double v_depletion, const double yPos, const int &tcount, const int n_balance,
+		const int count3, const double zPos, const double yPos, const int &tcount, const int n_balance,
 		const std::string hetct_conv_filename, const std::string hetct_noconv_filename, const std::string hetct_rc_filename): i_ramo_array(i_ramo_array),
 				i_conv_array(i_conv_array), i_rc_array(i_rc_array), vBias(vBias), i_conv(nullptr), i_ramo(nullptr), i_rc(nullptr),
-				z_shifts_array(z_shifts_array), z_shifts(z_shifts), voltages(voltages), y_shifts(y_shifts), z_shifts2(z_shifts2),
+				z_shifts_array(z_shifts_array), z_shifts(z_shifts), voltages_(voltages), y_shifts(y_shifts), z_shifts2(z_shifts2),
 				z_shifts1(z_shifts1), i_elec(i_elec), i_hole(i_hole), i_total(i_total), /*carrierCollection(nullptr),*/ n_tSteps(n_tSteps), /*detector(detector_aux),*/
 				voltage(voltage), cap(cap), stepY(stepY), stepZ(stepZ), stepV(stepV), neigh(neigh), dtime(dtime), n_ySteps(n_ySteps), n_vSteps(n_vSteps), n_zSteps_iter(n_zSteps_iter),
-				n_zSteps_array(n_zSteps_array), n_zSteps2(n_zSteps2), n_zSteps1(n_zSteps1), n_zSteps(n_zSteps), start(start), trap(trap), trapping(trapping),
-				carrierFile(carrierFile), depth(depth), width(width), pitch(pitch), nns(nns), temp(temp), fluence(fluence), nThreads_(nThreads), n_cells_x(n_cells_x), n_cells_y(n_cells_y),
-				bulk_type(bulk_type), implant_type(implant_type), waveLength(waveLength), scanType(scanType), capacitance(capacitance), dt(dt), max_time(max_time), vInit(vInit), deltaV(deltaV),
-				vMax(vMax), vDepletion(vDepletion), zInit(zInit), zMax(zMax), deltaZ(deltaZ), yInit(yInit), yMax(yMax), deltaY(deltaY), neff_param(neff_param), neffType(neffType),
-				n_par0(0), n_par1(0), n_par2(0), count1(0), count2(0), count3(0), zPos(0), v_depletion(0), yPos(0), tcount(0), n_balance(0), threadIndex(threadIndex),
+				n_zSteps_array(n_zSteps_array), n_zSteps2(n_zSteps2), n_zSteps1(n_zSteps1), n_zSteps(n_zSteps), start(start), trap(trap), trapping_(trapping),
+				carrierFile(carrierFile), depth_(depth), width_(width), pitch_(pitch), nns_(nns), temp_(temp), fluence_(fluence), nThreads_(nThreads), n_cells_x_(n_cells_x), n_cells_y_(n_cells_y),
+				bulk_type_(bulk_type), implant_type_(implant_type), waveLength(waveLength), scanType(scanType), capacitance(capacitance), dt(dt), max_time(max_time), vInit(vInit), deltaV(deltaV),
+				vMax(vMax), v_depletion_(vDepletion), zInit(zInit), zMax(zMax), deltaZ(deltaZ), yInit(yInit), yMax(yMax), deltaY(deltaY), neff_param_(neff_param), neffType_(neffType),
+				n_par0(0), n_par1(0), n_par2(0), count1(0), count2(0), count3(0), zPos(0), yPos(0), tcount(0), n_balance(0), threadIndex(threadIndex),
 				hetct_conv_filename(hetct_conv_filename), hetct_noconv_filename(hetct_noconv_filename), hetct_rc_filename(hetct_rc_filename)
 {
 
-	detector = new SMSDetector(*detector_aux);
+	//detector = new SMSDetector(*detector_aux);
+	detector = new SMSDetector(pitch_, width_, depth_, nns_, bulk_type_, implant_type_, n_cells_x_, n_cells_y_, temp_, trapping_, fluence_, neff_param_, neffType_);
+	detector->set_voltages(voltages_[0], v_depletion_);
+	detector->solve_w_u();
+	detector->solve_d_u();
+	detector->solve_w_f_grad();
+	detector->solve_d_f_grad();
+	detector->get_mesh()->bounding_box_tree();
+
 	carrierCollection = new CarrierCollection(detector);
 	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
 	carrierCollection->add_carriers_from_file(carrierFileName);
@@ -176,14 +188,14 @@ void TRACSInterface::set_NeffParam(std::vector<double> newParam)
 {
 	if ( newParam.size() == 8)
 	{
-		neff_param.assign(std::begin(newParam), std::end(newParam));
+		neff_param_.assign(std::begin(newParam), std::end(newParam));
 	}
 	else
 	{
 		std::cout << "Error setting up new Neff, incorrect number of parameters" << std::endl;
 	}
 
-	detector->set_neff_param(neff_param);
+	detector->set_neff_param(neff_param_);
 }
 
 /*
@@ -194,7 +206,7 @@ void TRACSInterface::set_NeffParam(std::vector<double> newParam)
 
 std::vector<double>TRACSInterface::get_NeffParam()
 {
-	return neff_param;
+	return neff_param_;
 } 
 
 
@@ -206,8 +218,8 @@ std::vector<double>TRACSInterface::get_NeffParam()
  */
 void TRACSInterface::set_trappingTime(double newTrapTime)
 {
-	trapping = newTrapTime;
-	detector->set_trapping_time(trapping);
+	trapping_ = newTrapTime;
+	detector->set_trapping_time(trapping_);
 }
 
 /*
@@ -229,7 +241,7 @@ void TRACSInterface::set_zPos(double newZPos)
  */
 void TRACSInterface::set_yPos(double newYPos)
 {
-	if (std::abs(newYPos) > (2*nns+1)*pitch)
+	if (std::abs(newYPos) > (2*nns_+1)*pitch_)
 	{
 		std::cout << "Watch out! You probably set the laser out of the detector" << std::endl;
 	}
@@ -243,7 +255,7 @@ void TRACSInterface::set_yPos(double newYPos)
 void TRACSInterface::set_vBias(double newVBias)
 {
 	vBias = newVBias;
-	detector->set_voltages(vBias, vDepletion);
+	detector->set_voltages(vBias, v_depletion_);
 }
 
 /*
@@ -282,8 +294,8 @@ void TRACSInterface::set_tcount(int tid)
  */
 void TRACSInterface::set_neffType(std::string newParametrization)
 {
-	neffType = newParametrization;
-	detector->set_neff_type(neffType);
+	neffType_ = newParametrization;
+	detector->set_neff_type(neffType_);
 
 
 }
@@ -338,12 +350,17 @@ void TRACSInterface::loop_on(uint tid)
 		set_yPos(y_shifts[params[1]]);
 		for (params[0] = 0; params[0] < n_par0 + 1; params[0]++)
 		{
-			std::cout << "Height " << z_shifts_array[tid][params[0]] << " of " << z_shifts.back()  <<  " || Y Position " <<
-					y_shifts[params[1]] << " of " << y_shifts.back() << " || Voltage " << voltages[params[2]] << " of "
-					<< voltages.back() << std::endl;
+			auto t1 = std::chrono::high_resolution_clock::now();
+			std::cout << "Height " << z_shifts_array[tid][params[0]] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[params[1]] << " of " << y_shifts.back() << " || Voltage " << voltages_[params[2]] << " of " << voltages_.back() << std::endl;
 			set_zPos(z_shifts_array[tid][params[0]]);
-			//std::cout << "Simulate ramo_current with thread " << tid << std::endl;
+
 			simulate_ramo_current();
+
+			auto t2 = std::chrono::high_resolution_clock::now();
+			auto int_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+			//std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
+			std::cout << "simulate ramo current " << int_ms.count() << std::endl;
+			int_ms = std::chrono::milliseconds(0);
 			//mtx2.lock();
 			i_ramo = GetItRamo();
 			i_ramo_array[tid][params[0]] = i_ramo; // for output
@@ -445,11 +462,11 @@ void TRACSInterface::write_to_file(int tid)
 				for (params[0] = 0; params[0] < i_ramo_array[i].size(); params[0]++)
 				{
 					utilities::write_to_file_row(hetct_noconv_filename, i_ramo_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages[params[2]]);
+							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
 					utilities::write_to_file_row(hetct_conv_filename, i_conv_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages[params[2]]);
+							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
 					utilities::write_to_file_row(hetct_rc_filename, i_rc_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages[params[2]]);
+							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
 
 				}
 

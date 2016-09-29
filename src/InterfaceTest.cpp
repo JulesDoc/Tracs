@@ -1,5 +1,4 @@
 #include <InitAllParameters.h>
-#include <InitDetector.h>
 #include "TRACSInterface.h"
 #include <thread>
 #include <mutex>
@@ -45,7 +44,7 @@ int main(int argc, char* argv[])
 	SMSDetector * detector = initAllParameters(num_threads, i_ramo_array, i_conv_array, i_rc_array, vBias, z_shifts_array, z_shifts,
 			voltages, y_shifts, z_shifts2, z_shifts1, i_elec, i_hole, i_total, carrierCollection, n_tSteps, detector_aux, voltage, cap, stepY, stepZ, stepV, neigh,
 			dtime, n_ySteps, n_vSteps, n_zSteps_iter, n_zSteps_array, n_zSteps2, n_zSteps1, n_zSteps, start, trap, trapping, fnm, carrierFile, depth, width,
-			pitch, nns, temp, fluence,nThreads, n_cells_x, n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time,vInit, deltaV,
+			pitch, nns, temp, fluence,nThreads, n_cells_x, n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV,
 			vMax, vDepletion, zInit, zMax, deltaZ, yInit, yMax, deltaY, neff_param, neffType, tcount, hetct_conv_filename, hetct_noconv_filename, hetct_rc_filename);
 
 
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
 				z_shifts2, z_shifts1, i_elec, i_hole, i_total,/* carrierCollection, */n_tSteps, detector, voltage, cap, stepY, stepZ, stepV, neigh, dtime, n_ySteps, n_vSteps,
 				n_zSteps_iter, n_zSteps_array, n_zSteps2, n_zSteps1, n_zSteps, start, trap, trapping, carrierFile, depth, width, pitch, nns, temp, fluence, num_threads, n_cells_x,
 				n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV, vMax, vDepletion, zInit, zMax, deltaZ, yInit,
-				yMax, deltaY, neff_param, neffType, n_par0, n_par1, n_par2, count1, count2, count3, zPos, v_depletion, yPos, tcount, n_balance,
+				yMax, deltaY, neff_param, neffType, n_par0, n_par1, n_par2, count1, count2, count3, zPos, yPos, tcount, n_balance,
 				hetct_conv_filename, hetct_noconv_filename, hetct_rc_filename);
 
 		TRACSsim.push_back(tracssim);
