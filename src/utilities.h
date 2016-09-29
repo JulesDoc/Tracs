@@ -25,7 +25,7 @@ namespace utilities
 	void paint_TH2D_qcp(TH2D hist, QCPColorMap * color_map);
 	void write_results_to_file(QString filename, QVector<QVector<double>> results);
 	void write_to_file_row(std::string filename, QVector<QVector<double>> results, double dt);
-	void write_to_file_row(std::string filename, TH1D *hconv, double temp, double yShift, double height, double voltage);
+	void write_to_file_row(std::string filename, TH1D * hconv, double temp, double yShift, double height, double voltage);
 	void write_to_hetct_header(std::string filename, SMSDetector detector, double C, double dt, std::vector<double> y_shifts, std::vector<double> z_shifts, double landa, std::string type, std::string carriers_file, std::vector<double> voltages);
 	void write_to_hetct_header(std::string filename, SMSDetector * detector, double C, double dt, std::vector<double> y_shifts, std::vector<double> z_shifts, double landa, std::string type, std::string carriers_file, std::vector<double> voltages);
 	std::string vector_to_string(std::vector<double> input_list);

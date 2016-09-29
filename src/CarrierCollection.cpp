@@ -8,8 +8,7 @@
  * 		WATCHOUT
  */
 
-CarrierCollection::CarrierCollection(SMSDetector * detector) :
-	_detector(detector)
+CarrierCollection::CarrierCollection(SMSDetector * detector) :_detector(detector)
 {
 
 }

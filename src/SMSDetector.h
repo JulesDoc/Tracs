@@ -7,6 +7,7 @@
 
 #include "Poisson.h"
 #include "Gradient.h"
+#include <mutex>
 
 #include <SMSDSubDomains.h>
 
@@ -27,7 +28,8 @@ class SMSDetector
     char _implant_type; // n or p
 	std::string _neff_type;
 	std::vector<double> _neff_param; // Neff parametrization
-		double _vdep; // depletion voltage
+	double _vdep; // depletion voltage
+	//mutable std::mutex safeRead;
 
     // some useful derived variables
     double _x_min; // in microns
@@ -75,9 +77,11 @@ class SMSDetector
 
   public:
     // default constructor and destructor
-    SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x = 100, int n_cells_y = 100, double tempK = 253., double trapping = 9e300, double fluence = 0.0, std::vector<double> neff_param = {0}, std::string neff_type = "Trilinear");
+    SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x = 100, int n_cells_y = 100,
+    		double tempK = 253., double trapping = 9e300, double fluence = 0.0, std::vector<double> neff_param = {0}, std::string neff_type = "Trilinear");
     ~SMSDetector();
     // set methods
+    //SMSDetector(const SMSDetector& other); //Copy declaration
     void set_voltages(double v_bias, double v_depletion);
     void set_pitch(double pitch);
     void set_width(double width);

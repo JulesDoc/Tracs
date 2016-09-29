@@ -1,49 +1,76 @@
+#include <InitAllParameters.h>
+#include <InitDetector.h>
 #include "TRACSInterface.h"
 #include <thread>
 #include <mutex>
-#include "global.h"
 
-//using namespace std;
-//num_threads = 2;
-//extern const int num_threads = 2;
-std::mutex mtx;           // mutex for critical sections
-std::string fnm="Config.TRACS";
-std::vector<TRACSInterface*> TRACSsim;
-std::vector<std::thread> t;
-//int init_num_threads; // initial number of threads, which might change dynamically
 
-void call_from_thread(int tid);
-
-//int main(int nthreads = std::thread::hardware_concurrency())
+//Main starts
 int main(int argc, char* argv[])
 {
-	std::cout << "Maximum number of available cores = " << std::thread::hardware_concurrency() <<std::endl;
-	if(argc<2)
-	{
-		num_threads = std::thread::hardware_concurrency(); // No. of threads = No. of cores
-	}
-	else
-		num_threads = atoi(argv[1]);
+	//Variables definition will be passed to each object constructor------------------------------------------------------------------------------
+	double pitch, width, depth, temp, trapping, fluence, capacitance, dt, max_time, vInit, deltaV, vMax,
+	v_depletion, deltaZ, zInit, zMax, yInit, yMax, deltaY, vBias, vDepletion, zPos, yPos;
+	int nThreads, nns, n_cells_y, n_cells_x, n_tSteps, waveLength, n_vSteps, n_zSteps, n_zSteps1,
+	n_zSteps2, n_zSteps_array, n_zSteps_iter, n_balance, n_ySteps, n_par0, n_par1, n_par2, tcount, count1, count2, count3;
+	char bulk_type, implant_type;
+
+	vector<vector <TH1D * > > i_ramo_array, i_conv_array, i_rc_array;
+	std::vector<TRACSInterface*> TRACSsim;
+	std::vector<int> params = {0, 0, 0};
+	//std::vector<double> neff_param = {0};
+	vector<vector <double> >  z_shifts_array;
+	std::vector<double>   z_shifts, z_shifts1, z_shifts2, y_shifts, voltages;
+	std::vector<double> neff_param(8,0);
+	std::valarray<double> i_total, i_elec, i_hole;
+	std::string fnm="Config.TRACS";
+	std::string carrierFile, neffType, scanType, trap, start, dtime, neigh, stepZ, stepV, stepY,
+	cap, voltage, hetct_conv_filename, hetct_noconv_filename, hetct_rc_filename;
+
+	//TH1D * i_ramo = nullptr, * i_rc = nullptr, * i_conv = nullptr;
+	SMSDetector * detector_aux = nullptr;
+	CarrierCollection * carrierCollection = nullptr;
+
+
+	//End variables definition-------------------------------------------------------------------------------------------------------------------
+
+	uint num_threads = atoi(argv[1]);
 	if(num_threads == 0){
 		num_threads = 1;
 	}
 	std::cout << "The execution will use " << num_threads << " Thread(s) "  <<std::endl;
 
-	TRACSsim.resize(num_threads);
-	t.resize(num_threads);
+
+	/*Setting up all the values, resizing arrays, calculating fields, building files*/
+	SMSDetector * detector = initAllParameters(num_threads, i_ramo_array, i_conv_array, i_rc_array, vBias, z_shifts_array, z_shifts,
+			voltages, y_shifts, z_shifts2, z_shifts1, i_elec, i_hole, i_total, carrierCollection, n_tSteps, detector_aux, voltage, cap, stepY, stepZ, stepV, neigh,
+			dtime, n_ySteps, n_vSteps, n_zSteps_iter, n_zSteps_array, n_zSteps2, n_zSteps1, n_zSteps, start, trap, trapping, fnm, carrierFile, depth, width,
+			pitch, nns, temp, fluence,nThreads, n_cells_x, n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time,vInit, deltaV,
+			vMax, vDepletion, zInit, zMax, deltaZ, yInit, yMax, deltaY, neff_param, neffType, tcount);
+
 
 	//Launching threads
-	for (int i = 0; i < num_threads; ++i) {
-		t[i] = std::thread(call_from_thread, i);
+	for (uint i = 0; i < num_threads; ++i) {
+
+		TRACSInterface * tracssim = new TRACSInterface(i, /*i_ramo_array, i_conv_array, i_rc_array,*/ vBias, z_shifts_array, z_shifts, voltages, y_shifts,
+				z_shifts2, z_shifts1, i_elec, i_hole, i_total,/* carrierCollection, */n_tSteps, detector, voltage, cap, stepY, stepZ, stepV, neigh, dtime, n_ySteps, n_vSteps,
+				n_zSteps_iter, n_zSteps_array, n_zSteps2, n_zSteps1, n_zSteps, start, trap, trapping, carrierFile, depth, width, pitch, nns, temp, fluence, num_threads, n_cells_x,
+				n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV, vMax, vDepletion, zInit, zMax, deltaZ, yInit,
+				yMax, deltaY, neff_param, neffType, n_par0, n_par1, n_par2, count1, count2, count3, zPos, v_depletion, yPos, tcount, n_balance);
+
+		TRACSsim.push_back(tracssim);
+		std::cout <<"Starting thread " << i << std::endl;
+		tracssim->startThread(i, "Thread " + i);
+
 	}
 
-	//Joining threads
-	for (int i = 0; i < num_threads; ++i) {
-		t[i].join();
+	for (auto tracs_elem : TRACSsim) {
+		tracs_elem->join();
 	}
 
 	//write output to single file!
 	TRACSsim[0]->write_to_file(0);
+
 	//Finalizing the execution
 	//getter test
 	std::vector<double> neff_test = TRACSsim[0]->get_NeffParam();
@@ -53,34 +80,17 @@ int main(int argc, char* argv[])
 		std::cout << neff_test[i] << std::endl;
 	}
 
-	for (int i = 0; i < TRACSsim.size(); i++)
+	for (uint i = 0; i < TRACSsim.size(); i++)
 	{
-	    delete TRACSsim[i];
+		delete TRACSsim[i];
 	}
 	return 0;
 }
 
-//This function will be called from a thread
-void call_from_thread(int tid) {
-	// every thread instantiates a new TRACSInterface object
-
-	mtx.lock();
-	std::cout << "Thread with tid " << tid << " is INSIDE the critical section "<< std::endl;
-	TRACSsim[tid] = new TRACSInterface(fnm);
-	TRACSsim[tid]->set_tcount(tid);
-	if(tid==0)
-	{
-		i_ramo_array.clear();
-		TRACSsim[tid]->resize_array();
-		TRACSsim[tid]->write_header(tid);
-		TRACSsim.resize(num_threads);
-	}
-	std::cout << "Thread with tid " << tid << " is OUTSIDE the critical section "<< std::endl;
-	mtx.unlock();
-	std::cout << "Thread with tid " << tid << " simulating ramo current - drifting "<< std::endl;
-	TRACSsim[tid]->loop_on(tid);
 
 
 
-}
+
+
+
 

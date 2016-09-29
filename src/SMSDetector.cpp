@@ -1,8 +1,8 @@
 #include <SMSDetector.h>
-#include <dolfin.h>
 #include <Source.h>
 
-SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x, int n_cells_y, double tempK, double trapping, double fluence, std::vector<double> neff_param, std::string neff_type) :
+SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x, int n_cells_y,
+		double tempK, double trapping, double fluence, std::vector<double> neff_param, std::string neff_type) :
     
     _pitch(pitch), //Distance between implants
     _width(width), //Size of the implant
@@ -45,8 +45,59 @@ SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char
     _w_u(_V_p),
     _d_u(_V_p),
     _w_f_grad(_V_g), // Weighting field
-    _d_f_grad(_V_g)
+    _d_f_grad(_V_g),
+	_f_poisson(0),
+	_v_strips(0),
+	_vdep(0),
+	_v_backplane(0)
 {
+}
+
+/*SMSDetector::SMSDetector(const SMSDetector& other)
+{
+	_pitch = other._pitch;
+	_width = other._width;
+	_depth = other._depth;
+	_tempK = other._tempK;
+	_trapping_time = other._trapping_time;
+	_fluence = other._fluence;
+	_nns = other._nns;
+	_bulk_type = other._bulk_type;
+	_implant_type = other._implant_type; //Dopant type of the implant, normally opposite of the bulk (n/p)
+	_neff_type = other._neff_type; // Select aproach to parametrize Neff (irradiation only)
+	_neff_param = other._neff_param;// Parametrized description of the Space Charge distribution
+	_x_min = other._x_min; // Starting horizontal position for carrier generation (hereafter CG)
+	_x_max = other._x_max; // Endingvertical positio for CG
+	_y_min = other._y_min;// Starting vertical position for CG (microns)
+	_y_max = other._y_max;// Ending vertical position for CG (microns)
+
+	// Mesh properties
+	_n_cells_x = other._n_cells_x;
+	_n_cells_y = other._n_cells_y;
+	//_mesh = other._mesh;
+	//_periodic_boundary = other._periodic_boundary;
+
+	// More detector properties/parts
+	//_central_strip = other._central_strip;
+	//_neighbour_strips = other._neighbour_strips;
+	//_backplane = other._backplane;
+	//_v_backplane = other._v_backplane;
+
+	// Functions & variables to solve the PDE
+	//_V_p = other._V_p;
+	//_a_p = other._a_p;
+	//_L_p= other._L_p;
+	//_V_g = other._V_g;
+	//_a_g = other._a_g;
+	//_L_g = other._L_g;
+	//_w_u = other._w_u;
+	//_d_u = other._d_u;
+	//_w_f_grad = other._w_f_grad;
+	//_d_f_grad = other._d_f_grad;
+	//_f_poisson = other._f_poisson;
+	//_v_strips = other._v_strips;
+	//_vdep = other._vdep;
+	std::lock_guard<std::mutex> lock(other.safeRead);
 }
 
 /*
@@ -54,7 +105,7 @@ SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char
  */
 void SMSDetector::set_voltages(double v_bias, double v_depletion)
 {
-	_vdep = v_depletion; // Store depletion voltage
+   _vdep = v_depletion; // Store depletion voltage
   _v_strips = (_implant_type == 'n') ? v_bias : 0.0;
   _v_backplane = (_implant_type == 'p') ? v_bias : 0.0;
   // neff defined in F/microns

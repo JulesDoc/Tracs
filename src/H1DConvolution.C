@@ -187,7 +187,7 @@ TH1D *H1DConvolution( TH1D *htf , TH1D *htct , Double_t Cend , int tid) {
 
 }
 
-TH1D *H1DConvolution( TH1D *htct , Double_t Cend, int tid) { 
+TH1D *H1DConvolution( TH1D * htct , Double_t Cend, int tid) {
    
    //mtx_conv.lock();
    TFile  *ftf = new TFile( "Centered_100ps_TransferFunction_Cividec_06052014.root");

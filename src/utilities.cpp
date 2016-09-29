@@ -110,7 +110,7 @@ void utilities::write_to_file_row(std::string filename, QVector<QVector<double>>
 
 // function to write results to file (in rows)
 // overloaded (now from TH1D)
-void utilities::write_to_file_row(std::string filename, TH1D *hconv, double temp, double yShift, double height, double voltage)
+void utilities::write_to_file_row(std::string filename, TH1D * hconv, double temp, double yShift, double height, double voltage)
 {
   unsigned long int steps = hconv->GetNbinsX();
  height = height/1000.;
@@ -369,7 +369,10 @@ std::string utilities::vector_to_string(std::vector<double> input_list)
 
 // Utility to read values for the simulation so main need not be compiled everytime
 // one wishes to modify the simulation parameters
-void utilities::parse_config_file(std::string fileName, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp, double &trapping, double &fluence, int &nThreads, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, int &waveLength, std::string &scanType, double &C, double &dt, double &max_time, double &v_init, double &deltaV, double &v_max, double &v_depletion, double &zInit, double &zMax, double &deltaZ, double &yInit, double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType)
+void utilities::parse_config_file(std::string fileName, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp,
+		double &trapping, double &fluence, int &nThreads, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, int &waveLength,
+		std::string &scanType, double &C, double &dt, double &max_time, double &v_init, double &deltaV, double &v_max, double &v_depletion,
+		double &zInit, double &zMax, double &deltaZ, double &yInit, double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType)
 {
 	// Creat map to hold all values as strings 
 	std::map< std::string, std::string> valuesMap;
@@ -657,7 +660,9 @@ void utilities::parse_config_file(std::string fileName, std::string &carrierFile
 
 // Utility to read values for the simulation so main need not be compiled everytime
 // one wishes to modify the simulation parameters
-void utilities::parse_config_file(std::string fileName, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp, double &trapping, double &fluence, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, double &C, double &dt, double &max_time, double &vBias, double &vDepletion, double &zPos, double &yPos, std::vector<double> &neff_param, std::string &neffType)
+void utilities::parse_config_file(std::string fileName, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp,
+		double &trapping, double &fluence, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, double &C, double &dt,
+		double &max_time, double &vBias, double &vDepletion, double &zPos, double &yPos, std::vector<double> &neff_param, std::string &neffType)
 {
 	// Creat map to hold all values as strings 
 	std::map< std::string, std::string> valuesMap;

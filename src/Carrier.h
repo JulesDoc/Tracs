@@ -4,7 +4,7 @@
 #include  <valarray>
 #include  <mutex>
 
-#include <CarrierTransport.h>
+#include "CarrierTransport.h"
 #include <SMSDetector.h>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -13,17 +13,6 @@
 
 using namespace boost::numeric::odeint;
 //using namespace dolfin;
-
-/*
- **************************CARRIER************************
- *
- *
- *  Detailed Description
- *
- *
- *
- *
- */
 
 class Carrier
 {
@@ -36,7 +25,7 @@ class Carrier
     std::array< double,2> _w_field; // weighting field at the carrier positions
     double _e_field_mod;
     int _sign; // sign to describe if carrier moves in e field direction or opposite
-		mutable std::mutex safeRead;
+	mutable std::mutex safeRead;
 
     SMSDetector * _detector;
     double _myTemp; // Temperature of the detector
