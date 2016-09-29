@@ -3,108 +3,108 @@
 // function to export to a root histogram from a dolfin 1d function
 TH2D utilities::export_to_histogram(Function &func, TString hist_name, TString hist_title, int n_bins_x , double x_min, double x_max, int n_bins_y, double y_min, double y_max)
 {
-  TH2D hist = TH2D(hist_name,hist_title, n_bins_x , x_min, x_max, n_bins_y, y_min, y_max);
-  double step_x = (x_max -x_min)/n_bins_x;
-  double step_y = (y_max -y_min)/n_bins_y;
-  for (int i=1; i<=n_bins_x; i++) {
-    for (int j=1; j<=n_bins_y; j++) {
-    double x_value = (i - 0.5)*step_x;
-    double y_value = (j - 0.5)*step_y;
-    hist.Fill(x_max-x_value,y_max-y_value, func(x_value, y_value));
-    }
-  }
-  return hist;
+	TH2D hist = TH2D(hist_name,hist_title, n_bins_x , x_min, x_max, n_bins_y, y_min, y_max);
+	double step_x = (x_max -x_min)/n_bins_x;
+	double step_y = (y_max -y_min)/n_bins_y;
+	for (int i=1; i<=n_bins_x; i++) {
+		for (int j=1; j<=n_bins_y; j++) {
+			double x_value = (i - 0.5)*step_x;
+			double y_value = (j - 0.5)*step_y;
+			hist.Fill(x_max-x_value,y_max-y_value, func(x_value, y_value));
+		}
+	}
+	return hist;
 }
 
 // function to paint a TH2D root histogram in a color map
 void  utilities::paint_TH2D_qcp(TH2D hist, QCPColorMap * color_map)
 {
-  // get some required variables
-  int n_bins_x = hist.GetNbinsX();
-  int n_bins_y = hist.GetNbinsY();
-  double x_min = hist.GetXaxis()->GetXmin();
-  double x_max = hist.GetXaxis()->GetXmax();
-  double y_min = hist.GetYaxis()->GetXmin();
-  double y_max = hist.GetYaxis()->GetXmax();
-  color_map->data()->setSize(n_bins_x,n_bins_y);
-  color_map->data()->setRange(QCPRange(x_min, x_max), QCPRange(y_min, y_max));
-  for (int x=0; x<n_bins_x; ++x)
-  {
-    for (int y=0; y<n_bins_y; ++y)
-    {
-      double content = hist.GetBinContent(x,y);
-      color_map->data()->setCell(x, y, content);
-    }
-  }
-  QCPColorGradient gpHot = QCPColorGradient::gpHot;
-  color_map->setGradient(gpHot.inverted());
-  color_map->rescaleDataRange(true);
+	// get some required variables
+	int n_bins_x = hist.GetNbinsX();
+	int n_bins_y = hist.GetNbinsY();
+	double x_min = hist.GetXaxis()->GetXmin();
+	double x_max = hist.GetXaxis()->GetXmax();
+	double y_min = hist.GetYaxis()->GetXmin();
+	double y_max = hist.GetYaxis()->GetXmax();
+	color_map->data()->setSize(n_bins_x,n_bins_y);
+	color_map->data()->setRange(QCPRange(x_min, x_max), QCPRange(y_min, y_max));
+	for (int x=0; x<n_bins_x; ++x)
+	{
+		for (int y=0; y<n_bins_y; ++y)
+		{
+			double content = hist.GetBinContent(x,y);
+			color_map->data()->setCell(x, y, content);
+		}
+	}
+	QCPColorGradient gpHot = QCPColorGradient::gpHot;
+	color_map->setGradient(gpHot.inverted());
+	color_map->rescaleDataRange(true);
 }
 
 // function to write results to file (in columns)
 void utilities::write_results_to_file(QString filename, QVector<QVector<double>> results)
 {
-  // open file
-  QFile file(filename);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-  {
-	  std::cout<<"File could not be open for writing"<<std::endl; 
-	  return;
-  }
+	// open file
+	QFile file(filename);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		std::cout<<"File could not be open for writing"<<std::endl;
+		return;
+	}
 
-  QTextStream out(&file);
-  QString s_time = "#time";
-  QString s_total = "#total";
-  QString s_elec = "#elec";
-  QString s_holes = "#holes";
+	QTextStream out(&file);
+	QString s_time = "#time";
+	QString s_total = "#total";
+	QString s_elec = "#elec";
+	QString s_holes = "#holes";
 
-  int s_width = 8;
+	int s_width = 8;
 
-  out << s_time.leftJustified(s_width) << "\t" << s_total.leftJustified(s_width) << "\t" << s_elec.leftJustified(s_width) << "\t" << s_holes.leftJustified(s_width);
+	out << s_time.leftJustified(s_width) << "\t" << s_total.leftJustified(s_width) << "\t" << s_elec.leftJustified(s_width) << "\t" << s_holes.leftJustified(s_width);
 
-  for (int i = 0; i < results[0].size(); i++ )
-  {
-    QString line = QString("\n%1\t%2\t%3\t%4").arg(results[0][i], s_width, 'E', 4)
-                                              .arg(results[1][i], s_width, 'E', 4)
-                                              .arg(results[2][i], s_width, 'E', 4)
-                                              .arg(results[3][i], s_width, 'E', 4);
-    out << line;
-  }
+	for (int i = 0; i < results[0].size(); i++ )
+	{
+		QString line = QString("\n%1\t%2\t%3\t%4").arg(results[0][i], s_width, 'E', 4)
+                                            		  .arg(results[1][i], s_width, 'E', 4)
+													  .arg(results[2][i], s_width, 'E', 4)
+													  .arg(results[3][i], s_width, 'E', 4);
+		out << line;
+	}
 }
 
 // function to write results to file (in rows)
 void utilities::write_to_file_row(std::string filename, QVector<QVector<double>> results, double dt)
 {
-  // open file
-//  QFile file(filename);
-//  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-//	  std::cout<<"File could not be open for writing"<<std::endl; 
-//      return;
-//
-//  QTextStream out(&file);
-  unsigned long int steps = results[0].size();
+	// open file
+	//  QFile file(filename);
+	//  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	//	  std::cout<<"File could not be open for writing"<<std::endl;
+	//      return;
+	//
+	//  QTextStream out(&file);
+	unsigned long int steps = results[0].size();
 
-  std::ofstream out(filename); // open file
-  std::ostringstream temp_oss; // create string stream for precision output
-  temp_oss << std::fixed ; 
-  temp_oss << std::setprecision(15) << dt; // set det with enough precision
-  
-  // Scan on z
-  for (int j = 0; j < results.size(); j++) 
-  {
-	  std::string line = temp_oss.str()+" "+std::to_string(steps)+" ";
+	std::ofstream out(filename); // open file
+	std::ostringstream temp_oss; // create string stream for precision output
+	temp_oss << std::fixed ;
+	temp_oss << std::setprecision(15) << dt; // set det with enough precision
 
-	  // Scan on times
-	  for (unsigned int i = 0; i < steps; i++ )
-	  {
-		line +=  std::to_string(results[j][i]) + " ";
-			
-	  }
+	// Scan on z
+	for (int j = 0; j < results.size(); j++)
+	{
+		std::string line = temp_oss.str()+" "+std::to_string(steps)+" ";
+
+		// Scan on times
+		for (unsigned int i = 0; i < steps; i++ )
+		{
+			line +=  std::to_string(results[j][i]) + " ";
+
+		}
 		out << line << "\n";
-  }
-  
-		temp_oss << std::setprecision(0) << dt; // set det with enough precision
-        out.close();
+	}
+
+	temp_oss << std::setprecision(0) << dt; // set det with enough precision
+	out.close();
 }
 
 
@@ -112,11 +112,11 @@ void utilities::write_to_file_row(std::string filename, QVector<QVector<double>>
 // overloaded (now from TH1D)
 void utilities::write_to_file_row(std::string filename, TH1D * hconv, double temp, double yShift, double height, double voltage)
 {
-  unsigned long int steps = hconv->GetNbinsX();
- height = height/1000.;
- yShift = yShift/1000.;
+	unsigned long int steps = hconv->GetNbinsX();
+	height = height/1000.;
+	yShift = yShift/1000.;
 
-  std::ofstream out; // open file
+	std::ofstream out; // open file
 	out.open(filename, std::ios_base::app);
 	if (out.is_open())
 	{
@@ -126,20 +126,20 @@ void utilities::write_to_file_row(std::string filename, TH1D * hconv, double tem
 		out << "0 " << " " << yShift << " " << height << " ";
 
 
-	  // Scan on times
-	  for (unsigned int i = 1; i <= steps; i++ )
-	  {
+		// Scan on times
+		for (unsigned int i = 1; i <= steps; i++ )
+		{
 			out << std::fixed << std::setprecision(9) << hconv->GetBinContent(i) << " "; 
 			//std::cout <<  steps << " " << i << " " << hconv->GetBinContent(i) << std::endl;
-	  }
+		}
 
 		//out << std::resetiosflags;
 		out << std::endl;
-    out.close();
+		out.close();
 	}
 	else // Error output
 	{
-	std::cout << "File could not be read/created"<<std::endl;
+		std::cout << "File could not be read/created"<<std::endl;
 	}
 }
 
@@ -164,13 +164,13 @@ void utilities::write_to_hetct_header(std::string filename, SMSDetector detector
 	if (nV > 1) deltaV = std::abs((voltages.back()-voltages.back())/(nV-1)); 	
 	if (nY > 1) deltaY = std::abs((voltages.back()-voltages.back())/(nY-1)); 	
 	double temp = detector.get_temperature() - 273;
-	
+
 	// Convert relevant quantities to string for outputting
 	std::string s_date = "2015-06-15_19-25";
 	std::string s_zVector = utilities::vector_to_string(z_shifts);
 	std::string s_vVector = utilities::vector_to_string(voltages);
 	std::string s_yVector = utilities::vector_to_string(y_shifts);
-	
+
 	// Open file
 	header.open (filename);  
 
@@ -243,7 +243,7 @@ void utilities::write_to_hetct_header(std::string filename, SMSDetector detector
 	}
 	else // Error output
 	{
-	std::cout << "File could not be created"<<std::endl;
+		std::cout << "File could not be created"<<std::endl;
 	}
 }
 
@@ -269,13 +269,13 @@ void utilities::write_to_hetct_header(std::string filename, SMSDetector * detect
 	if (nV > 1) deltaV = std::abs((voltages.back()-voltages.back())/(nV-1)); 	
 	if (nY > 1) deltaY = std::abs((voltages.back()-voltages.back())/(nY-1)); 	
 	double temp = detector->get_temperature() - 273;
-	
+
 	// Convert relevant quantities to string for outputting
 	std::string s_date = "2015-06-15_19-25";
 	std::string s_zVector = utilities::vector_to_string(z_shifts);
 	std::string s_vVector = utilities::vector_to_string(voltages);
 	std::string s_yVector = utilities::vector_to_string(y_shifts);
-	
+
 	// Open file
 	header.open (filename);  
 
@@ -348,7 +348,7 @@ void utilities::write_to_hetct_header(std::string filename, SMSDetector * detect
 	}
 	else // Error output
 	{
-	std::cout << "File could not be created"<<std::endl;
+		std::cout << "File could not be created"<<std::endl;
 	}
 }
 
@@ -397,261 +397,261 @@ void utilities::parse_config_file(std::string fileName, std::string &carrierFile
 			isstream >> id >> eq >> val;
 			if (eq != "=") 
 			{
-			std::cout << "Error ecountered while reading '" << id << std::endl;
-			break;
+				std::cout << "Error ecountered while reading '" << id << std::endl;
+				break;
 			}
 			else
 			{
-			// Store value on map as map[variabel] = value
-			valuesMap[id] = val;
+				// Store value on map as map[variabel] = value
+				valuesMap[id] = val;
 			}
 		}
 
-	tempString = std::string("Depth");
-	converter << valuesMap[tempString];
-	converter >> depth;
-	converter.str("");
-	converter.clear();
-	tempString = std::string("");
-	
-	tempString = std::string("Width");
-	converter << valuesMap[tempString];
-	converter >> width;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Depth");
+		converter << valuesMap[tempString];
+		converter >> depth;
+		converter.str("");
+		converter.clear();
+		tempString = std::string("");
 
-	tempString = std::string("Pitch");
-	converter << valuesMap[tempString];
-	converter >> pitch;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Width");
+		converter << valuesMap[tempString];
+		converter >> width;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("NeighbouringStrips");
-	converter << valuesMap[tempString];
-	converter >> nns;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Pitch");
+		converter << valuesMap[tempString];
+		converter >> pitch;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Temperature");
-	converter << valuesMap[tempString];
-	converter >> temp;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("NeighbouringStrips");
+		converter << valuesMap[tempString];
+		converter >> nns;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TrappingTime");
-	converter << valuesMap[tempString];
-	converter >> trapping;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Temperature");
+		converter << valuesMap[tempString];
+		converter >> temp;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Fluence");
-	converter << valuesMap[tempString];
-	converter >> fluence;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TrappingTime");
+		converter << valuesMap[tempString];
+		converter >> trapping;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("NumberOfThreads");
-	converter << valuesMap[tempString];
-	converter >> nThreads;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Fluence");
+		converter << valuesMap[tempString];
+		converter >> fluence;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CellsX");
-	converter << valuesMap[tempString];
-	converter >> n_cells_x;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("NumberOfThreads");
+		converter << valuesMap[tempString];
+		converter >> nThreads;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CellsY");
-	converter << valuesMap[tempString];
-	converter >> n_cells_y;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("CellsX");
+		converter << valuesMap[tempString];
+		converter >> n_cells_x;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Bulk");
-	converter << valuesMap[tempString];
-	converter >> bulk_type;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("CellsY");
+		converter << valuesMap[tempString];
+		converter >> n_cells_y;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Implant");
-	converter << valuesMap[tempString];
-	converter >> implant_type;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Bulk");
+		converter << valuesMap[tempString];
+		converter >> bulk_type;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Lambda");
-	converter << valuesMap[tempString];
-	converter >> waveLength;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Implant");
+		converter << valuesMap[tempString];
+		converter >> implant_type;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Capacitance");
-	converter << valuesMap[tempString];
-	converter >> C;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Lambda");
+		converter << valuesMap[tempString];
+		converter >> waveLength;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TimeStep");
-	converter << valuesMap[tempString];
-	converter >> dt;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Capacitance");
+		converter << valuesMap[tempString];
+		converter >> C;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TotalTime");
-	converter << valuesMap[tempString];
-	converter >> max_time;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TimeStep");
+		converter << valuesMap[tempString];
+		converter >> dt;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialVoltage");
-	converter << valuesMap[tempString];
-	converter >> v_init;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TotalTime");
+		converter << valuesMap[tempString];
+		converter >> max_time;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("VoltageStep");
-	converter << valuesMap[tempString];
-	converter >> deltaV;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("InitialVoltage");
+		converter << valuesMap[tempString];
+		converter >> v_init;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("MaxVoltage");
-	converter << valuesMap[tempString];
-	converter >> v_max;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("VoltageStep");
+		converter << valuesMap[tempString];
+		converter >> deltaV;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("DepletionVoltage");
-	converter << valuesMap[tempString];
-	converter >> v_depletion;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("MaxVoltage");
+		converter << valuesMap[tempString];
+		converter >> v_max;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("StepInZ");
-	converter << valuesMap[tempString];
-	converter >> deltaZ;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("DepletionVoltage");
+		converter << valuesMap[tempString];
+		converter >> v_depletion;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialZ");
-	converter << valuesMap[tempString];
-	converter >> zInit;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("StepInZ");
+		converter << valuesMap[tempString];
+		converter >> deltaZ;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("MaximumZ");
-	converter << valuesMap[tempString];
-	converter >> zMax;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("InitialZ");
+		converter << valuesMap[tempString];
+		converter >> zInit;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("StepInY");
-	converter << valuesMap[tempString];
-	converter >> deltaY;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("MaximumZ");
+		converter << valuesMap[tempString];
+		converter >> zMax;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialY");
-	converter << valuesMap[tempString];
-	converter >> yInit;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("StepInY");
+		converter << valuesMap[tempString];
+		converter >> deltaY;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("MaximumY");
-	converter << valuesMap[tempString];
-	converter >> yMax;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("InitialY");
+		converter << valuesMap[tempString];
+		converter >> yInit;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CarrierFile");
-	carrierFile = valuesMap[tempString];
-	tempString = std::string("");
+		tempString = std::string("MaximumY");
+		converter << valuesMap[tempString];
+		converter >> yMax;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("ScanType");
-	scanType = valuesMap[tempString];
-	tempString = std::string("");
+		tempString = std::string("CarrierFile");
+		carrierFile = valuesMap[tempString];
+		tempString = std::string("");
 
-	tempString = std::string("NeffParametrization");
-	neffType = valuesMap[tempString];
-	tempString = std::string("");
+		tempString = std::string("ScanType");
+		scanType = valuesMap[tempString];
+		tempString = std::string("");
 
-	tempString = std::string("y0");
-	converter << valuesMap[tempString];
-	converter >> neff_param[0];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("NeffParametrization");
+		neffType = valuesMap[tempString];
+		tempString = std::string("");
 
-	tempString = std::string("y1");
-	converter << valuesMap[tempString];
-	converter >> neff_param[1];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y0");
+		converter << valuesMap[tempString];
+		converter >> neff_param[0];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("y2");
-	converter << valuesMap[tempString];
-	converter >> neff_param[2];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y1");
+		converter << valuesMap[tempString];
+		converter >> neff_param[1];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("y3");
-	converter << valuesMap[tempString];
-	converter >> neff_param[3];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y2");
+		converter << valuesMap[tempString];
+		converter >> neff_param[2];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	//z0 = 0.0
-	neff_param[4] = 0.0;
+		tempString = std::string("y3");
+		converter << valuesMap[tempString];
+		converter >> neff_param[3];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("z1");
-	converter << valuesMap[tempString];
-	converter >> neff_param[5];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		//z0 = 0.0
+		neff_param[4] = 0.0;
 
-	tempString = std::string("z2");
-	converter << valuesMap[tempString];
-	converter >> neff_param[6];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("z1");
+		converter << valuesMap[tempString];
+		converter >> neff_param[5];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	//z3 = depth
-	neff_param[7] = depth;
+		tempString = std::string("z2");
+		converter << valuesMap[tempString];
+		converter >> neff_param[6];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
+
+		//z3 = depth
+		neff_param[7] = depth;
 
 	}
 	else
-{
+	{
 		std::cout << "Error opening the file. Does the file " << fileName << " exist?" << std::endl;
 	}
 }
@@ -687,202 +687,202 @@ void utilities::parse_config_file(std::string fileName, std::string &carrierFile
 			isstream >> id >> eq >> val;
 			if (eq != "=") 
 			{
-			std::cout << "Error ecountered while reading '" << id << std::endl;
-			break;
+				std::cout << "Error ecountered while reading '" << id << std::endl;
+				break;
 			}
 			else
 			{
-			// Store value on map as map[variabel] = value
-			valuesMap[id] = val;
+				// Store value on map as map[variabel] = value
+				valuesMap[id] = val;
 			}
 		}
 
 
-	tempString = std::string("Depth");
-	converter << valuesMap[tempString];
-	converter >> depth;
-	converter.str("");
-	converter.clear();
-	tempString = std::string("");
-	
-	tempString = std::string("Width");
-	converter << valuesMap[tempString];
-	converter >> width;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Depth");
+		converter << valuesMap[tempString];
+		converter >> depth;
+		converter.str("");
+		converter.clear();
+		tempString = std::string("");
 
-	tempString = std::string("Pitch");
-	converter << valuesMap[tempString];
-	converter >> pitch;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Width");
+		converter << valuesMap[tempString];
+		converter >> width;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("NeighbouringStrips");
-	converter << valuesMap[tempString];
-	converter >> nns;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Pitch");
+		converter << valuesMap[tempString];
+		converter >> pitch;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Temperature");
-	converter << valuesMap[tempString];
-	converter >> temp;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("NeighbouringStrips");
+		converter << valuesMap[tempString];
+		converter >> nns;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TrappingTime");
-	converter << valuesMap[tempString];
-	converter >> trapping;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Temperature");
+		converter << valuesMap[tempString];
+		converter >> temp;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Fluence");
-	converter << valuesMap[tempString];
-	converter >> fluence;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TrappingTime");
+		converter << valuesMap[tempString];
+		converter >> trapping;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CellsX");
-	converter << valuesMap[tempString];
-	converter >> n_cells_x;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Fluence");
+		converter << valuesMap[tempString];
+		converter >> fluence;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CellsY");
-	converter << valuesMap[tempString];
-	converter >> n_cells_y;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("CellsX");
+		converter << valuesMap[tempString];
+		converter >> n_cells_x;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Bulk");
-	converter << valuesMap[tempString];
-	converter >> bulk_type;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("CellsY");
+		converter << valuesMap[tempString];
+		converter >> n_cells_y;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Implant");
-	converter << valuesMap[tempString];
-	converter >> implant_type;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Bulk");
+		converter << valuesMap[tempString];
+		converter >> bulk_type;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("Capacitance");
-	converter << valuesMap[tempString];
-	converter >> C;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Implant");
+		converter << valuesMap[tempString];
+		converter >> implant_type;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TimeStep");
-	converter << valuesMap[tempString];
-	converter >> dt;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("Capacitance");
+		converter << valuesMap[tempString];
+		converter >> C;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("TotalTime");
-	converter << valuesMap[tempString];
-	converter >> max_time;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TimeStep");
+		converter << valuesMap[tempString];
+		converter >> dt;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialVoltage");
-	converter << valuesMap[tempString];
-	converter >> vBias;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("TotalTime");
+		converter << valuesMap[tempString];
+		converter >> max_time;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("DepletionVoltage");
-	converter << valuesMap[tempString];
-	converter >> vDepletion;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("InitialVoltage");
+		converter << valuesMap[tempString];
+		converter >> vBias;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialZ");
-	converter << valuesMap[tempString];
-	converter >> zPos;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("DepletionVoltage");
+		converter << valuesMap[tempString];
+		converter >> vDepletion;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("InitialY");
-	converter << valuesMap[tempString];
-	converter >> yPos;
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("InitialZ");
+		converter << valuesMap[tempString];
+		converter >> zPos;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("CarrierFile");
-	carrierFile = valuesMap[tempString];
-	tempString = std::string("");
+		tempString = std::string("InitialY");
+		converter << valuesMap[tempString];
+		converter >> yPos;
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("NeffParametrization");
-	neffType = valuesMap[tempString];
-	tempString = std::string("");
+		tempString = std::string("CarrierFile");
+		carrierFile = valuesMap[tempString];
+		tempString = std::string("");
 
-	tempString = std::string("y0");
-	converter << valuesMap[tempString];
-	converter >> neff_param[0];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("NeffParametrization");
+		neffType = valuesMap[tempString];
+		tempString = std::string("");
 
-	tempString = std::string("y1");
-	converter << valuesMap[tempString];
-	converter >> neff_param[1];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y0");
+		converter << valuesMap[tempString];
+		converter >> neff_param[0];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("y2");
-	converter << valuesMap[tempString];
-	converter >> neff_param[2];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y1");
+		converter << valuesMap[tempString];
+		converter >> neff_param[1];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("y3");
-	converter << valuesMap[tempString];
-	converter >> neff_param[3];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("y2");
+		converter << valuesMap[tempString];
+		converter >> neff_param[2];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	//z0 = 0.0
-	neff_param[4] = 0.0;
+		tempString = std::string("y3");
+		converter << valuesMap[tempString];
+		converter >> neff_param[3];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	tempString = std::string("z1");
-	converter << valuesMap[tempString];
-	converter >> neff_param[5];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		//z0 = 0.0
+		neff_param[4] = 0.0;
 
-	tempString = std::string("z2");
-	converter << valuesMap[tempString];
-	converter >> neff_param[6];
-	converter.clear();
-	converter.str("");
-	tempString = std::string("");
+		tempString = std::string("z1");
+		converter << valuesMap[tempString];
+		converter >> neff_param[5];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
 
-	//z3 = depth
-	neff_param[7] = depth;
+		tempString = std::string("z2");
+		converter << valuesMap[tempString];
+		converter >> neff_param[6];
+		converter.clear();
+		converter.str("");
+		tempString = std::string("");
+
+		//z3 = depth
+		neff_param[7] = depth;
 
 	}
 	else
-{
+	{
 		std::cout << "Error opening the file. Does the file " << fileName << " exist?" << std::endl;
 	}
 }
@@ -929,13 +929,13 @@ void utilities::parse_config_file(std::string fileName, std::string &carrierFile
 	//converter.str("");
 	//tempString = std::string("");
 	}
-	
+
 	else
 	{
 		std::cout << "Error opening the file. Does the file " << fileName << " exist?" << std::endl;
 	}
 }
-*/
+ */
 
 
 void utilities::valarray2Hist(TH1D *hist, std::valarray<double> &valar)

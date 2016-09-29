@@ -11,8 +11,8 @@
 #include "TRACSInterface.h"
 #include "global.h"
 
-SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ramo_array,
-		vector<vector <TH1D *> > i_conv_array, vector<vector <TH1D *> > i_rc_array,
+SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ramo_array,
+		vector<vector <TH1D *> > &i_conv_array, vector<vector <TH1D *> > &i_rc_array,
 		double &vBias,/* TH1D * i_conv, TH1D * i_rc, TH1D * i_ramo,*/ vector<vector<double>> &z_shifts_array, std::vector<double> &z_shifts,
 		std::vector<double> &voltages, std::vector<double> &y_shifts, std::vector<double>  &z_shifts2,
 		std::vector<double> &z_shifts1, std::valarray<double> &i_elec, std::valarray<double> &i_hole, std::valarray<double> &i_total,
@@ -22,6 +22,7 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 		double &trapping, std::string fnm, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp, double &fluence,
 		int &nThreads, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, int &waveLength, std::string &scanType, double &capacitance,double &dt,
 		double &max_time, double &vInit, double &deltaV, double &vMax, double &vDepletion, double &zInit, double &zMax, double &deltaZ, double &yInit,
-		double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType, int &tcount);
+		double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType, int &tcount, std::string &hetct_conv_filename,
+		std::string &hetct_noconv_filename, std::string &hetct_rc_filename);
 
 #endif /* SRC_INITALLPARAMETERS_H_ */

@@ -6,8 +6,8 @@
  */
 #include <InitAllParameters.h>
 
-SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ramo_array,
-		vector<vector <TH1D *> > i_conv_array, vector<vector <TH1D *> > i_rc_array,
+SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ramo_array,
+		vector<vector <TH1D *> > &i_conv_array, vector<vector <TH1D *> > &i_rc_array,
 		double &vBias, /*TH1D * i_conv, TH1D * i_rc, TH1D * i_ramo,*/ vector<vector<double>> &z_shifts_array,
 		std::vector<double> &z_shifts, std::vector<double> &voltages, std::vector<double> &y_shifts, std::vector<double>  &z_shifts2,
 		std::vector<double> &z_shifts1, std::valarray<double> &i_elec, std::valarray<double> &i_hole, std::valarray<double> &i_total,
@@ -17,7 +17,8 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 		double &trapping, std::string fnm, std::string &carrierFile, double &depth, double &width, double &pitch, int &nns, double &temp, double &fluence,
 		int &nThreads, int &n_cells_x, int &n_cells_y, char &bulk_type, char &implant_type, int &waveLength, std::string &scanType, double &capacitance,double &dt,
 		double &max_time, double &vInit, double &deltaV, double &vMax, double &vDepletion, double &zInit, double &zMax, double &deltaZ, double &yInit,
-		double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType, int &tcount){
+		double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType, int &tcount, std::string &hetct_conv_filename,
+		std::string &hetct_noconv_filename, std::string &hetct_rc_filename){
 
 
 
@@ -26,7 +27,7 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 			bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV, vMax, vDepletion, zInit, zMax, deltaZ, yInit,
 			yMax, deltaY, neff_param, neffType);
 
-	//i_ramo_array.clear();
+	i_ramo_array.clear();
 
 	detector = new SMSDetector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
 	detector->set_voltages(vInit, vDepletion);
@@ -122,11 +123,11 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 
 	for (int i = 0; i < num_threads; i++)
 	{	l = i;
-		for (int j = 0; j < z_shifts_array[i].size(); j++ )
-		{
-			z_shifts_array[i][j] = z_shifts[l];
-			l+=num_threads;
-		}
+	for (int j = 0; j < z_shifts_array[i].size(); j++ )
+	{
+		z_shifts_array[i][j] = z_shifts[l];
+		l+=num_threads;
+	}
 	}
 
 	// Create shifts in Y
@@ -143,7 +144,7 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 		i_ramo_array[i].resize(z_shifts_array[i].size());
 		i_rc_array[i].resize(z_shifts_array[i].size());
 		i_conv_array[i].resize(z_shifts_array[i].size());
-		//std::cout << "i_ramo_array[xlen][ylen]   " << i_ramo_array.size()<<"  " <<i_ramo_array[i].size() <<std::endl;
+		std::cout << "i_ramo_array[xlen][ylen]   " << i_ramo_array.size()<<"  " <<i_ramo_array[i].size() <<std::endl;
 	}
 
 	//calculating fields
@@ -164,9 +165,9 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > i_ram
 	y_chifs = y_shifts;
 	std::transform(y_chifs.begin(), y_chifs.end(), y_chifs.begin(), std::bind1st(std::multiplies<double>(),(1./1000.)));
 	// filename for data analysis
-	std::string hetct_conv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_conv.hetct";
-	std::string hetct_noconv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_noconv.hetct";
-	std::string hetct_rc_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_rc.hetct";
+	hetct_conv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_conv.hetct";
+	hetct_noconv_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_noconv.hetct";
+	hetct_rc_filename = start+"_dt"+dtime+"ps_"+cap+"pF_t"+trap+"ns_dz"+stepZ+"um_dy"+stepY+"dV"+stepV+"V_"+neigh+"nns_"+scanType+"_"+std::to_string(tcount)+"_rc.hetct";
 
 
 	// write header for data analysis
