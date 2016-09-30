@@ -6,26 +6,26 @@
 #include "utilities.h"
 #include "Carrier.h"
 #include "CarrierCollection.h"
-#include <TFile.h>
 #include "TF1.h"
 #include "AExecutable.h"
+#include <TFile.h>
 #include <sys/types.h>
 #include <cstdint>
-//#include <TH1D.h> // 1 Dimesional ROOT histogram
 #include <TTree.h>
 #include <iterator>
-#include <limits>  // std::numeric_limits
+#include <limits>
 #include <cmath>
 #include <functional>
 #include <memory>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
-//#include <vector>
-#include "global.h"
-#include <stdlib.h>     /* exit, EXIT_FAILURE */
-
+#include <stdlib.h>
+#include <chrono>
+#include <ratio>
 
 using std::vector;
+using std::string;
+using std::valarray;
 
 extern TH1D *H1DConvolution( TH1D *htct, Double_t Cend=0. , int tid=0) ; 
 
@@ -84,40 +84,40 @@ private:
 	vector<vector <TH1D *> >  i_ramo_array, i_conv_array, i_rc_array;
 	//vector<vector <TH1D*> >  i_ramo_array, i_conv_array, i_rc_array;
 
-	std::vector<double> neff_param_ = {0};
-	std::valarray<double> i_total;
-	std::valarray<double> i_elec;
-	std::valarray<double> i_hole;
+	vector<double> neff_param_ = {0};
+	valarray<double> i_total;
+	valarray<double> i_elec;
+	valarray<double> i_hole;
 
-	std::vector<double>  z_shifts;
+	vector<double>  z_shifts;
 	vector<vector <double> >  z_shifts_array;
 
 	//double z_shifts_array[10][10];
-	std::vector<double>  z_shifts1, z_shifts2;
-	std::vector<double>  y_shifts; // laser shift in X axis to center laser focus over read-out strip
-	std::vector<double>  voltages_;
+	vector<double>  z_shifts1, z_shifts2;
+	vector<double>  y_shifts; // laser shift in X axis to center laser focus over read-out strip
+	vector<double>  voltages_;
 
 
-	std::string carrierFile;
-	std::string neffType_;
-	std::string scanType;
+	string carrierFile;
+	string neffType_;
+	string scanType;
 
 	//file naming
-	std::string trap, start;
+	string trap, start;
 	// Convert relevant simulation numbers to string for fileNaming
-	std::string dtime;
-	std::string neigh;
-	std::string stepV;
-	std::string stepZ;
-	std::string stepY;
-	std::string cap;
+	string dtime;
+	string neigh;
+	string stepV;
+	string stepZ;
+	string stepY;
+	string cap;
 	//std::string z_step  = std::to_string((int) std::floor(deltaZ));
-	std::string voltage;
+	string voltage;
 
 	// filename for data analysis
-	std::string hetct_conv_filename;
-	std::string hetct_noconv_filename;
-	std::string hetct_rc_filename;
+	string hetct_conv_filename;
+	string hetct_noconv_filename;
+	string hetct_rc_filename;
 
 	//TH1D i_ramo;
 	//auto i_ramo = make_shared<int> (3);
@@ -135,21 +135,21 @@ private:
 public:
 
 	// Constructor
-	TRACSInterface(const uint threadIndex, vector<vector <TH1D *> > i_ramo_array,
-			vector<vector <TH1D *> > i_conv_array, vector<vector <TH1D *> > i_rc_array, const double vBias,
-			const vector<vector<double>> z_shifts_array,
-			const std::vector<double> z_shifts, const std::vector<double> voltages, const std::vector<double> y_shifts, const std::vector<double> z_shifts2,
-			const std::vector<double> z_shifts1, const std::valarray<double> i_elec, const std::valarray<double> i_hole, const std::valarray<double> i_total,
-			const int n_tSteps, SMSDetector * const detector, const std::string voltage, const std::string cap, const std::string stepY, const std::string stepZ,
-			const std::string stepV, const std::string neigh, const std::string dtime, const int n_ySteps, const int n_vSteps, const int n_zSteps_iter,
-			const int n_zSteps_array, const int n_zSteps2, const int n_zSteps1, const int n_zSteps, const std::string start, const std::string trap,
-			const double trapping, const std::string carrierFile, const double depth, const double width, const double pitch, const int nns, const double temp,
-			const double fluence, const int nThreads, const int n_cells_x, const int n_cells_y, const char bulk_type, const char implant_type, const int waveLength,
-			const std::string &scanType, const double capacitance, const double dt, const double max_time, const double vInit, const double deltaV, const double vMax,
-			const double vDepletion, const double zInit, const double zMax, const double deltaZ, const double yInit, const double yMax, const double deltaY,
-			const std::vector<double> neff_param, const std::string neffType, const int n_par0, const int n_par1, const int n_par2, const int count1, const int count2,
-			const int count3, const double zPos, const double yPos, const int &tcount, const int n_balance,
-			const std::string hetct_conv_filename, const std::string hetct_noconv_filename, const std::string hetct_rc_filename); // Reads values, initializes detector
+	TRACSInterface(const uint &threadIndex, vector<vector <TH1D *> > i_ramo_array,
+			vector<vector <TH1D *> > i_conv_array, vector<vector <TH1D *> > i_rc_array, const double &vBias,
+			const vector<vector<double>> &z_shifts_array,
+			const std::vector<double> &z_shifts, const std::vector<double> &voltages, const std::vector<double> &y_shifts, const std::vector<double> &z_shifts2,
+			const std::vector<double> &z_shifts1, const std::valarray<double> &i_elec, const std::valarray<double> &i_hole, const std::valarray<double> &i_total,
+			const int &n_tSteps, SMSDetector * const &detector, const std::string &voltage, const std::string &cap, const std::string &stepY, const std::string &stepZ,
+			const std::string &stepV, const std::string &neigh, const std::string &dtime, const int &n_ySteps, const int &n_vSteps, const int &n_zSteps_iter,
+			const int &n_zSteps_array, const int &n_zSteps2, const int &n_zSteps1, const int &n_zSteps, const std::string &start, const std::string &trap,
+			const double &trapping, const std::string &carrierFile, const double &depth, const double &width, const double &pitch, const int &nns, const double &temp,
+			const double &fluence, const int &nThreads, const int &n_cells_x, const int &n_cells_y, const char &bulk_type, const char &implant_type, const int &waveLength,
+			const std::string &scanType, const double &capacitance, const double &dt, const double &max_time, const double &vInit, const double &deltaV, const double &vMax,
+			const double &vDepletion, const double &zInit, const double &zMax, const double &deltaZ, const double &yInit, const double &yMax, const double &deltaY,
+			const std::vector<double> &neff_param, const std::string &neffType, const int &n_par0, const int &n_par1, const int &n_par2, const int &count1, const int &count2,
+			const int &count3, const double &zPos, const double &yPos, const int &tcount, const int &n_balance,
+			const std::string &hetct_conv_filename, const std::string &hetct_noconv_filename, const std::string &hetct_rc_filename); // Reads values, initializes detector
 
 	// Destructor
 	~TRACSInterface();

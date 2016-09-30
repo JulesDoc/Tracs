@@ -1,39 +1,21 @@
 #include "TRACSInterface.h"
-#include "AExecutable.h"
-#include <iostream>
-#include <chrono>
-#include <ratio>
-#include <thread>
-#include <mutex>          // std::mutex
-/*
- * Constructor of class TRACSInterface
- * it takes the configuration file path as the only input and gets the 
- * rest of the data from said file
- *
- * This class provides a modular interface to TRACS simulator via 
- * different methods that allows the user to leverage all TRACS 
- * functionalities with their own code and use TRACS as a library for 
- * silicon detectors simulation.
- *
- */
 
-std::mutex mtx2;
 
-TRACSInterface::TRACSInterface(const uint threadIndex, const vector<vector <TH1D *> > i_ramo_array,
-		const vector<vector <TH1D *> > i_conv_array, const vector<vector <TH1D *> > i_rc_array,
-		const double vBias, const vector<vector<double>> z_shifts_array,
-		const std::vector<double> z_shifts, const std::vector<double> voltages, const std::vector<double> y_shifts,
-		const std::vector<double> z_shifts2, const std::vector<double> z_shifts1, const std::valarray<double> i_elec, const std::valarray<double> i_hole,
-		const std::valarray<double> i_total, const int n_tSteps, SMSDetector * const detector_aux, const std::string voltage, const std::string cap, const std::string stepY,
-		const std::string stepZ, const std::string stepV, const std::string neigh, const std::string dtime, const int n_ySteps, const int n_vSteps, const int n_zSteps_iter,
-		const int n_zSteps_array, const int n_zSteps2, const int n_zSteps1, const int n_zSteps, const std::string start, const std::string trap,
-		const double trapping, const std::string carrierFile, const double depth, const double width, const double pitch, const int nns, const double temp,
-		const double fluence, const int nThreads, const int n_cells_x, const int n_cells_y, const char bulk_type, const char implant_type, const int waveLength,
-		const std::string &scanType, const double capacitance, const double dt, const double max_time, const double vInit, const double deltaV, const double vMax,
-		const double vDepletion, const double zInit, const double zMax, const double deltaZ, const double yInit, const double yMax, const double deltaY,
-		const std::vector<double> neff_param, const std::string neffType, const int n_par0, const int n_par1, const int n_par2, const int count1, const int count2,
-		const int count3, const double zPos, const double yPos, const int &tcount, const int n_balance,
-		const std::string hetct_conv_filename, const std::string hetct_noconv_filename, const std::string hetct_rc_filename): i_ramo_array(i_ramo_array),
+TRACSInterface::TRACSInterface(const uint &threadIndex, const vector<vector <TH1D *> >i_ramo_array,
+		const vector<vector <TH1D *> >i_conv_array, const vector<vector <TH1D *> >i_rc_array,
+		const double &vBias, const vector<vector<double>> &z_shifts_array,
+		const vector<double> &z_shifts, const vector<double> &voltages, const vector<double> &y_shifts,
+		const vector<double> &z_shifts2, const vector<double> &z_shifts1, const valarray<double> &i_elec, const valarray<double> &i_hole,
+		const valarray<double> &i_total, const int &n_tSteps, SMSDetector * const &detector_aux, const string &voltage, const string &cap, const string &stepY,
+		const string &stepZ, const string &stepV, const string &neigh, const string &dtime, const int &n_ySteps, const int &n_vSteps, const int &n_zSteps_iter,
+		const int &n_zSteps_array, const int &n_zSteps2, const int &n_zSteps1, const int &n_zSteps, const string &start, const string &trap,
+		const double &trapping, const string &carrierFile, const double &depth, const double &width, const double &pitch, const int &nns, const double &temp,
+		const double &fluence, const int &nThreads, const int &n_cells_x, const int &n_cells_y, const char &bulk_type, const char &implant_type, const int &waveLength,
+		const string &scanType, const double &capacitance, const double &dt, const double &max_time, const double &vInit, const double &deltaV, const double &vMax,
+		const double &vDepletion, const double &zInit, const double &zMax, const double &deltaZ, const double &yInit, const double &yMax, const double &deltaY,
+		const vector<double> &neff_param, const string &neffType, const int &n_par0, const int &n_par1, const int &n_par2, const int &count1, const int &count2,
+		const int &count3, const double &zPos, const double &yPos, const int &tcount, const int &n_balance,
+		const string &hetct_conv_filename, const string &hetct_noconv_filename, const string &hetct_rc_filename): i_ramo_array(i_ramo_array),
 				i_conv_array(i_conv_array), i_rc_array(i_rc_array), vBias(vBias), i_conv(nullptr), i_ramo(nullptr), i_rc(nullptr),
 				z_shifts_array(z_shifts_array), z_shifts(z_shifts), voltages_(voltages), y_shifts(y_shifts), z_shifts2(z_shifts2),
 				z_shifts1(z_shifts1), i_elec(i_elec), i_hole(i_hole), i_total(i_total), /*carrierCollection(nullptr),*/ n_tSteps(n_tSteps), /*detector(detector_aux),*/
@@ -46,7 +28,7 @@ TRACSInterface::TRACSInterface(const uint threadIndex, const vector<vector <TH1D
 				hetct_conv_filename(hetct_conv_filename), hetct_noconv_filename(hetct_noconv_filename), hetct_rc_filename(hetct_rc_filename)
 {
 
-	//detector = new SMSDetector(*detector_aux);
+
 	detector = new SMSDetector(pitch_, width_, depth_, nns_, bulk_type_, implant_type_, n_cells_x_, n_cells_y_, temp_, trapping_, fluence_, neff_param_, neffType_);
 	detector->set_voltages(voltages_[0], v_depletion_);
 	detector->solve_w_u();
@@ -68,11 +50,9 @@ TRACSInterface::TRACSInterface(const uint threadIndex, const vector<vector <TH1D
 // Destructor
 TRACSInterface::~TRACSInterface()
 {
-	//delete[] i_ramo;
-	//delete[] i_rc;
-	//delete[] i_conv;
-	//delete[] carrierCollection;
-	//delete[] detector;
+
+	delete carrierCollection;
+	delete detector;
 }
 
 /*
@@ -85,13 +65,11 @@ TH1D * TRACSInterface::GetItRamo()
 	}
 	else
 	{
-		//TF1 *f1 = new TF1("f1","abs(sin(x)/x)*sqrt(x)",0,10);
-		//float r = f1->GetRandom();
+
 		TString htit3, hname3;
 		htit3.Form("ramo_%d_%d", tcount, count1);
 		hname3.Form("Ramo_current_%d_%d", tcount, count1);
 		i_ramo = new TH1D(htit3,hname3,n_tSteps, 0.0, max_time);
-		//std::cout << htit << std::endl;
 
 		// Compute time + format vectors for writting to file
 		for (int j=0; j < n_tSteps; j++)
@@ -115,8 +93,7 @@ TH1D * TRACSInterface::GetItRc()
 	}
 	else
 	{
-		//TF1 *f1 = new TF1("f1","abs(sin(x)/x)*sqrt(x)",0,10);
-		//float r = f1->GetRandom();
+
 		TString htit2, hname2;
 		htit2.Form("ramo_rc%d%d", tcount, count2);
 		hname2.Form("Ramo_current_%d_%d", tcount, count2);
@@ -146,8 +123,7 @@ TH1D * TRACSInterface::GetItConv()
 	}
 	else
 	{
-		//TF1 *f1 = new TF1("f1","abs(sin(x)/x)*sqrt(x)",0,10);
-		//float r = f1->GetRandom();
+
 		TString htit1, hname1;
 		htit1.Form("ramo_conv_%d_%d", tcount, count3);
 		hname1.Form("Ramo current_%d_%d", tcount, count3);
@@ -345,22 +321,20 @@ void TRACSInterface::loop_on(uint tid)
 	//detector->set_voltages(voltages[params[2]], vDepletion);
 	//calculate_fields();
 
-	for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)
-	{
+	//for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)
+	//{
 		set_yPos(y_shifts[params[1]]);
 		for (params[0] = 0; params[0] < n_par0 + 1; params[0]++)
 		{
-			auto t1 = std::chrono::high_resolution_clock::now();
+			//auto t1 = std::chrono::high_resolution_clock::now();
 			std::cout << "Height " << z_shifts_array[tid][params[0]] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[params[1]] << " of " << y_shifts.back() << " || Voltage " << voltages_[params[2]] << " of " << voltages_.back() << std::endl;
 			set_zPos(z_shifts_array[tid][params[0]]);
-
 			simulate_ramo_current();
-
-			auto t2 = std::chrono::high_resolution_clock::now();
-			auto int_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+			//auto t2 = std::chrono::high_resolution_clock::now();
+			//auto int_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 			//std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
-			std::cout << "simulate ramo current " << int_ms.count() << std::endl;
-			int_ms = std::chrono::milliseconds(0);
+			//std::cout << "simulate ramo current " << int_ms.count() << std::endl;
+			//int_ms = std::chrono::milliseconds(0);
 			//mtx2.lock();
 			i_ramo = GetItRamo();
 			i_ramo_array[tid][params[0]] = i_ramo; // for output
@@ -374,7 +348,7 @@ void TRACSInterface::loop_on(uint tid)
 			//mtx2.unlock();
 
 		}
-	}
+	//}
 
 	//}
 
@@ -453,27 +427,27 @@ void TRACSInterface::write_to_file(int tid)
 	n_par1 = n_ySteps;
 	n_par2 = n_vSteps;
 	//loop
-	for (params[2] = 0; params[2] < n_par2 + 1; params[2]++)
-	{
-		for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)
-		{
-			for (int i = 0; i < nThreads_; i++)
-			{
-				for (params[0] = 0; params[0] < i_ramo_array[i].size(); params[0]++)
+	//for (params[2] = 0; params[2] < n_par2 + 1; params[2]++)
+	//{
+		//for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)
+		//{
+			//for (int i = 0; i < nThreads_; i++)
+			//{
+				for (params[0] = 0; params[0] < i_ramo_array[tid].size(); params[0]++)
 				{
-					utilities::write_to_file_row(hetct_noconv_filename, i_ramo_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
-					utilities::write_to_file_row(hetct_conv_filename, i_conv_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
-					utilities::write_to_file_row(hetct_rc_filename, i_rc_array[i][params[0]], detector->get_temperature(),
-							y_shifts[params[1]], z_shifts_array[i][params[0]], voltages_[params[2]]);
+					utilities::write_to_file_row(hetct_noconv_filename, i_ramo_array[tid][params[0]], detector->get_temperature(),
+							y_shifts[params[1]], z_shifts_array[tid][params[0]], voltages_[params[2]]);
+					utilities::write_to_file_row(hetct_conv_filename, i_conv_array[tid][params[0]], detector->get_temperature(),
+							y_shifts[params[1]], z_shifts_array[tid][params[0]], voltages_[params[2]]);
+					utilities::write_to_file_row(hetct_rc_filename, i_rc_array[tid][params[0]], detector->get_temperature(),
+							y_shifts[params[1]], z_shifts_array[tid][params[0]], voltages_[params[2]]);
 
 				}
 
 
-			}
-		}
+			//}
+		//}
 
-	}
+	//}
 
 }

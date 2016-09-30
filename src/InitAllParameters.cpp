@@ -4,7 +4,7 @@
  *  Created on: Sep 26, 2016
  *      Author: jcalvopi
  */
-#include <InitAllParameters.h>
+#include "InitAllParameters.h"
 
 SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ramo_array,
 		vector<vector <TH1D *> > &i_conv_array, vector<vector <TH1D *> > &i_rc_array,
@@ -20,21 +20,14 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 		double &yMax, double &deltaY, std::vector<double> &neff_param, std::string &neffType, int &tcount, std::string &hetct_conv_filename,
 		std::string &hetct_noconv_filename, std::string &hetct_rc_filename){
 
-
-
-	//utilities::parse_config_file(filename, carrierFile, depth, width, pitch, nns, temp, trapping, fluence, n_cells_x, n_cells_y, bulk_type, implant_type, C, dt, max_time, vBias, vDepletion, zPos, yPos, neff_param, neffType);
 	utilities::parse_config_file(fnm, carrierFile, depth, width,  pitch, nns, temp, trapping, fluence, nThreads, n_cells_x, n_cells_y,
 			bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV, vMax, vDepletion, zInit, zMax, deltaZ, yInit,
 			yMax, deltaY, neff_param, neffType);
 
-	i_ramo_array.clear();
 
 	detector = new SMSDetector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
-	//detector->set_voltages(vInit, vDepletion);
-	//detector->solve_w_u();
-	//carrierCollection = new CarrierCollection(detector);
 	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
-	//carrierCollection->add_carriers_from_file(carrierFileName);
+
 
 	if (fluence <= 0) // if no fluence -> no trapping
 	{
@@ -74,12 +67,6 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 	voltage = std::to_string((int) std::floor(vInit));
 
 	parameters["allow_extrapolation"] = true;
-
-
-	//SMSDetector detector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
-	//detector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
-	//detector = new SMSDetector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType):
-	//pDetector = &detector;
 
 	n_tSteps = (int) std::floor(max_time / dt);
 
@@ -147,13 +134,6 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 		std::cout << "i_ramo_array[xlen][ylen]   " << i_ramo_array.size()<<"  " <<i_ramo_array[i].size() <<std::endl;
 	}
 
-	//calculating fields
-
-	//detector->solve_w_u();
-	//detector->solve_d_u();
-	//detector->solve_w_f_grad();
-	//detector->solve_d_f_grad();
-	//detector->get_mesh()->bounding_box_tree();
 
 	// Convert Z to milimeters
 	std::vector<double> z_chifs(n_zSteps+1);
@@ -175,13 +155,7 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 	utilities::write_to_hetct_header(hetct_noconv_filename, detector, capacitance, dt, y_chifs, z_chifs, waveLength, scanType, carrierFile, voltages);
 	utilities::write_to_hetct_header(hetct_rc_filename, detector, capacitance, dt, y_chifs, z_chifs, waveLength, scanType, carrierFile, voltages);
 
-
 	vBias = vInit;
-	//set_tcount(0);
-
-	//i_ramo  = NULL;
-	//i_rc    = NULL;
-	//i_conv  = NULL;
 
 	return detector;
 }

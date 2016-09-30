@@ -1,8 +1,9 @@
-#include <InitAllParameters.h>
+#include "InitAllParameters.h"
 #include "TRACSInterface.h"
 #include <thread>
 #include <mutex>
 
+#define NEFF_NUM 8
 
 //Main starts
 int main(int argc, char* argv[])
@@ -15,22 +16,18 @@ int main(int argc, char* argv[])
 	char bulk_type, implant_type;
 
 	vector<vector <TH1D * > > i_ramo_array, i_conv_array, i_rc_array;
-	std::vector<TRACSInterface*> TRACSsim;
-	std::vector<int> params = {0, 0, 0};
-	//std::vector<double> neff_param = {0};
+	vector<TRACSInterface*> TRACSsim;
+	vector<int> params = {0, 0, 0};
 	vector<vector <double> >  z_shifts_array;
-	std::vector<double>   z_shifts, z_shifts1, z_shifts2, y_shifts, voltages;
-	std::vector<double> neff_param(8,0);
-	std::valarray<double> i_total, i_elec, i_hole;
-	std::string fnm="Config.TRACS";
-	std::string carrierFile, neffType, scanType, trap, start, dtime, neigh, stepZ, stepV, stepY,
+	vector<double>   z_shifts, z_shifts1, z_shifts2, y_shifts, voltages;
+	vector<double> neff_param(NEFF_NUM,0);
+	valarray<double> i_total, i_elec, i_hole;
+	string fnm="Config.TRACS";
+	string carrierFile, neffType, scanType, trap, start, dtime, neigh, stepZ, stepV, stepY,
 	cap, voltage, hetct_conv_filename, hetct_noconv_filename, hetct_rc_filename;
 
-	//TH1D * i_ramo = nullptr, * i_rc = nullptr, * i_conv = nullptr;
 	SMSDetector * detector_aux = nullptr;
 	CarrierCollection * carrierCollection = nullptr;
-
-
 	//End variables definition-------------------------------------------------------------------------------------------------------------------
 
 	uint num_threads = atoi(argv[1]);
@@ -68,16 +65,17 @@ int main(int argc, char* argv[])
 		tracs_elem->join();
 	}
 
-	//write output to single file!
-	TRACSsim[0]->write_to_file(0);
+	std::cout << "Writing to file..." <<std::endl;
+	for (uint i = 0; i < TRACSsim.size(); ++i) {
+		//write output to single file!
+		TRACSsim[i]->write_to_file(i);
+	}
 
-	//Finalizing the execution
-	//getter test
-	std::vector<double> neff_test = TRACSsim[0]->get_NeffParam();
-	std::cout << "Neff param.: " << std::endl;
-	for (int i = 0; i < 8; i++)
+	neff_param = TRACSsim[0]->get_NeffParam();
+	std::cout << "Neff parameter: " << std::endl;
+	for (int i = 0; i < NEFF_NUM; i++)
 	{
-		std::cout << neff_test[i] << std::endl;
+		std::cout << neff_param[i] << std::endl;
 	}
 
 	for (uint i = 0; i < TRACSsim.size(); i++)
