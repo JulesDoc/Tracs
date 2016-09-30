@@ -74,31 +74,31 @@ SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char
 	// Mesh properties
 	_n_cells_x = other._n_cells_x;
 	_n_cells_y = other._n_cells_y;
-	//_mesh = other._mesh;
-	//_periodic_boundary = other._periodic_boundary;
+	_mesh = other._mesh;
+	_periodic_boundary = other._periodic_boundary;
 
 	// More detector properties/parts
-	//_central_strip = other._central_strip;
-	//_neighbour_strips = other._neighbour_strips;
-	//_backplane = other._backplane;
-	//_v_backplane = other._v_backplane;
+	_central_strip = other._central_strip;
+	_neighbour_strips = other._neighbour_strips;
+	_backplane = other._backplane;
+	_v_backplane = other._v_backplane;
 
 	// Functions & variables to solve the PDE
-	//_V_p = other._V_p;
-	//_a_p = other._a_p;
-	//_L_p= other._L_p;
-	//_V_g = other._V_g;
-	//_a_g = other._a_g;
-	//_L_g = other._L_g;
-	//_w_u = other._w_u;
-	//_d_u = other._d_u;
-	//_w_f_grad = other._w_f_grad;
-	//_d_f_grad = other._d_f_grad;
-	//_f_poisson = other._f_poisson;
-	//_v_strips = other._v_strips;
-	//_vdep = other._vdep;
+_	 V_p = other._V_p;
+	_a_p = other._a_p;
+	_L_p= other._L_p;
+	_V_g = other._V_g;
+	_a_g = other._a_g;
+	_L_g = other._L_g;
+	_w_u = other._w_u;
+	_d_u = other._d_u;
+	_w_f_grad = other._w_f_grad;
+	_d_f_grad = other._d_f_grad;
+	_f_poisson = other._f_poisson;
+	_v_strips = other._v_strips;
+	_vdep = other._vdep;
 	std::lock_guard<std::mutex> lock(other.safeRead);
-}
+}*/
 
 /*
  * Set right polarity for detector depending on the type (p-on-n/n-on-p)

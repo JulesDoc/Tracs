@@ -1,7 +1,6 @@
 #include "InitAllParameters.h"
 #include "TRACSInterface.h"
-#include <thread>
-#include <mutex>
+
 
 #define NEFF_NUM 8
 

@@ -6,7 +6,7 @@ TRACSInterface::TRACSInterface(const uint &threadIndex, const vector<vector <TH1
 		const double &vBias, const vector<vector<double>> &z_shifts_array,
 		const vector<double> &z_shifts, const vector<double> &voltages, const vector<double> &y_shifts,
 		const vector<double> &z_shifts2, const vector<double> &z_shifts1, const valarray<double> &i_elec, const valarray<double> &i_hole,
-		const valarray<double> &i_total, const int &n_tSteps, SMSDetector * const &detector_aux, const string &voltage, const string &cap, const string &stepY,
+		const valarray<double> &i_total, const int &n_tSteps, SMSDetector * const detector_aux, const string &voltage, const string &cap, const string &stepY,
 		const string &stepZ, const string &stepV, const string &neigh, const string &dtime, const int &n_ySteps, const int &n_vSteps, const int &n_zSteps_iter,
 		const int &n_zSteps_array, const int &n_zSteps2, const int &n_zSteps1, const int &n_zSteps, const string &start, const string &trap,
 		const double &trapping, const string &carrierFile, const double &depth, const double &width, const double &pitch, const int &nns, const double &temp,
@@ -25,11 +25,17 @@ TRACSInterface::TRACSInterface(const uint &threadIndex, const vector<vector <TH1
 				bulk_type_(bulk_type), implant_type_(implant_type), waveLength(waveLength), scanType(scanType), capacitance(capacitance), dt(dt), max_time(max_time), vInit(vInit), deltaV(deltaV),
 				vMax(vMax), v_depletion_(vDepletion), zInit(zInit), zMax(zMax), deltaZ(deltaZ), yInit(yInit), yMax(yMax), deltaY(deltaY), neff_param_(neff_param), neffType_(neffType),
 				n_par0(0), n_par1(0), n_par2(0), count1(0), count2(0), count3(0), zPos(0), yPos(0), tcount(0), n_balance(0), threadIndex(threadIndex),
-				hetct_conv_filename(hetct_conv_filename), hetct_noconv_filename(hetct_noconv_filename), hetct_rc_filename(hetct_rc_filename)
+				hetct_conv_filename(hetct_conv_filename), hetct_noconv_filename(hetct_noconv_filename), hetct_rc_filename(hetct_rc_filename), carrierCollection(nullptr),
+				detector(nullptr)
 {
 
 
-	detector = new SMSDetector(pitch_, width_, depth_, nns_, bulk_type_, implant_type_, n_cells_x_, n_cells_y_, temp_, trapping_, fluence_, neff_param_, neffType_);
+
+	//detector = new SMSDetector(*detector_aux);
+	//detector = detector_aux;
+
+
+/*	detector = new SMSDetector(pitch_, width_, depth_, nns_, bulk_type_, implant_type_, n_cells_x_, n_cells_y_, temp_, trapping_, fluence_, neff_param_, neffType_);
 	detector->set_voltages(voltages_[0], v_depletion_);
 	detector->solve_w_u();
 	detector->solve_d_u();
@@ -39,7 +45,7 @@ TRACSInterface::TRACSInterface(const uint &threadIndex, const vector<vector <TH1
 
 	carrierCollection = new CarrierCollection(detector);
 	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
-	carrierCollection->add_carriers_from_file(carrierFileName);
+	carrierCollection->add_carriers_from_file(carrierFileName);*/
 
 
 
@@ -301,6 +307,18 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
  * 
  */
 void TRACSInterface::thread(){
+
+	detector = new SMSDetector(pitch_, width_, depth_, nns_, bulk_type_, implant_type_, n_cells_x_, n_cells_y_, temp_, trapping_, fluence_, neff_param_, neffType_);
+	detector->set_voltages(voltages_[0], v_depletion_);
+	detector->solve_w_u();
+	detector->solve_d_u();
+	detector->solve_w_f_grad();
+	detector->solve_d_f_grad();
+	detector->get_mesh()->bounding_box_tree();
+
+	carrierCollection = new CarrierCollection(detector);
+	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
+	carrierCollection->add_carriers_from_file(carrierFileName);
 	loop_on(threadIndex);
 }
 
@@ -310,6 +328,7 @@ void TRACSInterface::loop_on(uint tid)
 	params[0] = 0; //zPos
 	params[1] = 0; //yPos;
 	params[2] = 0; //vPos;
+
 
 	n_par0 = (int) z_shifts_array[tid].size()-1;
 	//n_par0 = n_zSteps_array;
@@ -330,12 +349,7 @@ void TRACSInterface::loop_on(uint tid)
 			std::cout << "Height " << z_shifts_array[tid][params[0]] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[params[1]] << " of " << y_shifts.back() << " || Voltage " << voltages_[params[2]] << " of " << voltages_.back() << std::endl;
 			set_zPos(z_shifts_array[tid][params[0]]);
 			simulate_ramo_current();
-			//auto t2 = std::chrono::high_resolution_clock::now();
-			//auto int_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-			//std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
-			//std::cout << "simulate ramo current " << int_ms.count() << std::endl;
-			//int_ms = std::chrono::milliseconds(0);
-			//mtx2.lock();
+
 			i_ramo = GetItRamo();
 			i_ramo_array[tid][params[0]] = i_ramo; // for output
 			//i_ramo = nullptr;

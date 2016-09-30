@@ -222,7 +222,7 @@ Carrier& Carrier::operator = (const Carrier& other)
 	std::lock(safeRead, other.safeRead);
 	std::lock_guard<std::mutex> self_lock(safeRead, std::adopt_lock);
 	std::lock_guard<std::mutex> other_lock(other.safeRead, std::adopt_lock);
-  _carrier_type = other._carrier_type;
+    _carrier_type = other._carrier_type;
 	_q = other._q;
 	_gen_time = other._gen_time;
 	_x = other._x; 

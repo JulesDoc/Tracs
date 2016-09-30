@@ -140,7 +140,7 @@ public:
 			const vector<vector<double>> &z_shifts_array,
 			const std::vector<double> &z_shifts, const std::vector<double> &voltages, const std::vector<double> &y_shifts, const std::vector<double> &z_shifts2,
 			const std::vector<double> &z_shifts1, const std::valarray<double> &i_elec, const std::valarray<double> &i_hole, const std::valarray<double> &i_total,
-			const int &n_tSteps, SMSDetector * const &detector, const std::string &voltage, const std::string &cap, const std::string &stepY, const std::string &stepZ,
+			const int &n_tSteps, SMSDetector * const detector, const std::string &voltage, const std::string &cap, const std::string &stepY, const std::string &stepZ,
 			const std::string &stepV, const std::string &neigh, const std::string &dtime, const int &n_ySteps, const int &n_vSteps, const int &n_zSteps_iter,
 			const int &n_zSteps_array, const int &n_zSteps2, const int &n_zSteps1, const int &n_zSteps, const std::string &start, const std::string &trap,
 			const double &trapping, const std::string &carrierFile, const double &depth, const double &width, const double &pitch, const int &nns, const double &temp,
