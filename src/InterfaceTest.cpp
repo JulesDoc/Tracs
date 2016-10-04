@@ -1,9 +1,10 @@
 #include "InitAllParameters.h"
 #include "TRACSInterface.h"
+#include <mutex>
 
 
 #define NEFF_NUM 8
-
+std::mutex m;
 //Main starts
 int main(int argc, char* argv[])
 {
@@ -25,8 +26,8 @@ int main(int argc, char* argv[])
 	string carrierFile, neffType, scanType, trap, start, dtime, neigh, stepZ, stepV, stepY,
 	cap, voltage, hetct_conv_filename, hetct_noconv_filename, hetct_rc_filename;
 
-	SMSDetector * detector_aux = nullptr;
-	CarrierCollection * carrierCollection = nullptr;
+	SMSDetector * detector_aux;
+	CarrierCollection * carrierCollection;
 	//End variables definition-------------------------------------------------------------------------------------------------------------------
 
 	uint num_threads = atoi(argv[1]);
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 	for (uint i = 0; i < num_threads; ++i) {
 
 		TRACSInterface * tracssim = new TRACSInterface(i, i_ramo_array, i_conv_array, i_rc_array, vBias, z_shifts_array, z_shifts, voltages, y_shifts,
-				z_shifts2, z_shifts1, i_elec, i_hole, i_total,/* carrierCollection, */n_tSteps, detector, voltage, cap, stepY, stepZ, stepV, neigh, dtime, n_ySteps, n_vSteps,
+				z_shifts2, z_shifts1, i_elec, i_hole, i_total, carrierCollection, n_tSteps, detector, voltage, cap, stepY, stepZ, stepV, neigh, dtime, n_ySteps, n_vSteps,
 				n_zSteps_iter, n_zSteps_array, n_zSteps2, n_zSteps1, n_zSteps, start, trap, trapping, carrierFile, depth, width, pitch, nns, temp, fluence, num_threads, n_cells_x,
 				n_cells_y, bulk_type, implant_type, waveLength, scanType, capacitance, dt, max_time, vInit, deltaV, vMax, vDepletion, zInit, zMax, deltaZ, yInit,
 				yMax, deltaY, neff_param, neffType, n_par0, n_par1, n_par2, count1, count2, count3, zPos, yPos, tcount, n_balance,
@@ -56,8 +57,9 @@ int main(int argc, char* argv[])
 
 		TRACSsim.push_back(tracssim);
 		std::cout <<"Starting thread " << i << std::endl;
+		m.lock();
 		tracssim->startThread(i, "Thread " + i);
-
+		m.unlock();
 	}
 
 	for (auto tracs_elem : TRACSsim) {

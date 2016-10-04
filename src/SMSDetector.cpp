@@ -4,7 +4,7 @@
 SMSDetector::SMSDetector(double pitch, double width, double depth, int nns, char bulk_type, char implant_type, int n_cells_x, int n_cells_y,
 		double tempK, double trapping, double fluence, std::vector<double> neff_param, std::string neff_type) :
     
-    _pitch(pitch), //Distance between implants
+     _pitch(pitch), //Distance between implants
     _width(width), //Size of the implant
     _depth(depth), //Vertical size of the pad (typically 300microns)
     _tempK(tempK), // Temperature of the detector

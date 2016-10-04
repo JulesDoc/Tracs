@@ -26,7 +26,10 @@ SMSDetector * initAllParameters(uint num_threads, vector<vector <TH1D *> > &i_ra
 
 
 	detector = new SMSDetector(pitch, width, depth, nns, bulk_type, implant_type, n_cells_x, n_cells_y, temp, trapping, fluence, neff_param, neffType);
-	QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
+
+
+
+	//QString carrierFileName = QString::fromUtf8(carrierFile.c_str());
 
 
 	if (fluence <= 0) // if no fluence -> no trapping
