@@ -4,12 +4,12 @@
 #include  <valarray>
 #include  <mutex>
 
-#include <CarrierTransport.h>
-#include <SMSDetector.h>
-
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 #include <boost/numeric/odeint/stepper/runge_kutta4.hpp>
 #endif
+
+#include <CarrierTransport.h>
+#include <SMSDetector.h>
 
 using namespace boost::numeric::odeint;
 //using namespace dolfin;

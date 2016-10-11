@@ -1,9 +1,11 @@
 #ifndef SMSDETECTOR_H
 #define SMSDETECTOR_H
 
-#include <dolfin.h>
+
 #include <cmath> 
 #include <limits>  // std::numeric_limits
+
+#include <dolfin.h>
 
 #include "Poisson.h"
 #include "Gradient.h"

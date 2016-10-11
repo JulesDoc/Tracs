@@ -1,16 +1,17 @@
 #ifndef CARRIER_COLLECTION_H
 #define CARRIER_COLLECTION_H
 
+#include "Carrier.h"
+
 #include <string>
 #include <sstream>
 #include <fstream>
 
 #include <QString>
-
 #include <TH2D.h>
 #include <TString.h>
 
-#include "Carrier.h"
+
 
 /*
  ***********************************CARRIER COLLECTION***********************************

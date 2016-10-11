@@ -390,39 +390,47 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
  *	example: TRACSsim->loop_on("x","v","y");
  * 
  */
-  void TRACSInterface::loop_on(int tid)
+void TRACSInterface::loop_on(int tid)
  {
 
- 	params[0] = 0; //zPos 
- 	params[1] = 0; //yPos;
- 	params[2] = 0; //vPos;
+ 	//params[0] = 0; //zPos
+ 	//params[1] = 0; //yPos;
+ 	//params[2] = 0; //vPos;
+ 	//uint vPos = 0;
+ 	//uint yPos = 0;
+ 	//uint zPos = 0;
  	
- 			n_par0 = (int) z_shifts_array[tid].size()-1;
+ 			//n_par0 = (int) z_shifts_array[tid].size()-1;
 		 	 		//n_par0 = n_zSteps_array;
-		 	 		n_par1 = n_ySteps;
-			 		n_par2 = n_vSteps;
+		 	 		//n_par1 = n_ySteps;
+			 		//n_par2 = n_vSteps;
 	 		 		//loop
-		 		 	for (params[2] = 0; params[2] < n_par2 + 1; params[2]++)
+		 		 	/*for (params[2] = 0; params[2] < n_par2 + 1; params[2]++)*/
+			 		for (uint vPos = 0; vPos < n_vSteps + 1; vPos++)
 		 			{
-		 	 			detector->set_voltages(voltages[params[2]], vDepletion);
+		 	 			detector->set_voltages(voltages[vPos], vDepletion);
 						calculate_fields();
 
-						for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)
+						/*for (params[1] = 0; params[1] < n_par1 + 1; params[1]++)*/
+						for (uint yPos = 0; yPos < n_ySteps + 1; yPos++)
 						{
-							set_yPos(y_shifts[params[1]]);
-							for (params[0] = 0; params[0] < n_par0 + 1; params[0]++)
+							set_yPos(y_shifts[yPos]);
+							/*for (params[0] = 0; params[0] < n_par0 + 1; params[0]++)*/
+							for (uint zPos = 0; zPos < z_shifts_array[tid].size(); zPos++)
 							{
-								std::cout << "Height " << z_shifts_array[tid][params[0]] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[params[1]] << " of " << y_shifts.back() << " || Voltage " << voltages[params[2]] << " of " << voltages.back() << std::endl;								
-								set_zPos(z_shifts_array[tid][params[0]]);
+
+								std::cout << "Height " << z_shifts_array[tid][zPos] << " of " << z_shifts.back()  <<  " || Y Position " << y_shifts[yPos]
+										  << " of " << y_shifts.back() << " || Voltage " << voltages[vPos] << " of " << voltages.back() << std::endl;
+								set_zPos(z_shifts_array[tid][zPos]);
 								simulate_ramo_current();
 								i_ramo = GetItRamo();
-								i_ramo_array[tid][params[0]] = i_ramo; // for output
+								i_ramo_array[tid][zPos] = i_ramo; // for output
 								i_ramo = NULL;
 								i_rc = GetItRc();
-								i_rc_array[tid][params[0]] = i_rc; // for output								
+								i_rc_array[tid][zPos] = i_rc; // for output
 								mtx2.lock();
 								i_conv = GetItConv();
-								i_conv_array[tid][params[0]] = i_conv; // for output
+								i_conv_array[tid][zPos] = i_conv; // for output
 								mtx2.unlock();
 
 							}
@@ -430,9 +438,9 @@ void TRACSInterface::set_carrierFile(std::string newCarrFile)
 
 	 		 		}
 
- 	n_par0 = 0;
- 	n_par1 = 0;
- 	n_par2 = 0;
+ 	//n_par0 = 0;
+ 	//n_par1 = 0;
+ 	//n_par2 = 0;
 
  }
 

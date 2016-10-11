@@ -1,18 +1,17 @@
 #include "TRACSInterface.h"
+#include "threading.h"
 #include <thread>
-#include <mutex>
-#include "global.h"
 
 //using namespace std;
 //num_threads = 2;
 //extern const int num_threads = 2;
-std::mutex mtx;           // mutex for critical sections
-std::string fnm="Config.TRACS";
-std::vector<TRACSInterface*> TRACSsim;
+        // mutex for critical sections
+
+extern std::vector<TRACSInterface*> TRACSsim;
 std::vector<std::thread> t;
 //int init_num_threads; // initial number of threads, which might change dynamically
 
-void call_from_thread(int tid);
+//void call_from_thread(int tid);
 
 //int main(int nthreads = std::thread::hardware_concurrency())
 int main(int argc, char* argv[])
@@ -57,30 +56,9 @@ int main(int argc, char* argv[])
 	{
 	    delete TRACSsim[i];
 	}
+	std::quick_exit(1);
 	return 0;
 }
 
-//This function will be called from a thread
-void call_from_thread(int tid) {
-	// every thread instantiates a new TRACSInterface object
 
-	mtx.lock();
-	std::cout << "Thread with tid " << tid << " is INSIDE the critical section "<< std::endl;
-	TRACSsim[tid] = new TRACSInterface(fnm);
-	TRACSsim[tid]->set_tcount(tid);
-	if(tid==0)
-	{
-		i_ramo_array.clear();
-		TRACSsim[tid]->resize_array();
-		TRACSsim[tid]->write_header(tid);
-		TRACSsim.resize(num_threads);
-	}
-	std::cout << "Thread with tid " << tid << " is OUTSIDE the critical section "<< std::endl;
-	mtx.unlock();
-	std::cout << "Thread with tid " << tid << " simulating ramo current - drifting "<< std::endl;
-	TRACSsim[tid]->loop_on(tid);
-
-
-
-}
 
