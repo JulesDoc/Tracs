@@ -15,8 +15,7 @@
 void call_from_thread(int tid) {
 	// every thread instantiates a new TRACSInterface object
 	extern std::vector<TRACSInterface*> TRACSsim;
-	std::string fnm="Config.TRACS";
-	std::mutex mtx;
+
 	mtx.lock();
 	std::cout << "Thread with tid " << tid << " is INSIDE the critical section "<< std::endl;
 	TRACSsim[tid] = new TRACSInterface(fnm);
