@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
 	{
 	    delete TRACSsim[i];
 	}
+	std::quick_exit(1);
 	return 0;
 }
 
