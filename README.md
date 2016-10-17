@@ -5,61 +5,82 @@ Simulator of transient currents and charge collection in semiconductor detectors
 
 ![Screenshot of ](/docs/images/TRACS_CNVT.png?raw=true)
 
-# Requisites
+# TRACS Complete Installation under Linux in 5 minutes and 7 steps (August 2016)
 
-  - [C++11 compatible compiler](http://en.cppreference.com/w/cpp/compiler_support) (**Important!**) ||
-    Tested only with g++-4.8 and Clang 6.x
 
-  - [CMake](http://www.cmake.org/download/)
-  
-  - [Fenics Libraries](http://fenicsproject.org/download/) ||
-    Compatibility has been fixed (only tested up to 1.6.x)
-  
-  - [Qt4](http://download.qt.io/archive/qt/) ||
-    Qt5 is not compatible 
+1- If the system is recently fresh installed:
 
-  - [ROOT](https://root.cern.ch/downloading-root) ||
-    Used for exporting histograms and generation of arbitrary charge distributions
-    Recommended version 6.x
-
-# Installation
-
-1) Get the source
-
-    git clone https://github.com/IFCA-HEP/TRACS
+   	sudo apt-get update
+   	sudo apt-get install build-essential
+   	sudo apt-get install cmake
+   	sudo apt-get install git
     
-2)[OPTIONAL - Recommended] Recompile fenics files
+2- Test gcc version, must be >= than 4.8
 
-    cd TRACS/src
-    ffc -l dolfin Poisson.ufl
-    ffc -l dolfin Gradient.ufl
-    cd ../
+   	gcc –version 
     
-3) Create folder to store executables
+3- Installing ROOT:
+It is preferable to run pre-build binaries of ROOT on la Linux system:
 
-    cd TRACS
+    wget  https://root.cern.ch/download/root_v6.06.06.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+    sudo cp root_v6.06.06.Linux-ubuntu14-x86_64-gcc4.8.tar.gz /usr/local
+    cd /usr/local
+    sudo tar -xvzf root_v6.06.06.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+    
+Modify .bashrc for ROOT:
+Add the following 3 environment variables to your .bashrc file; This file should be in your home directory:
+  
+    export ROOTSYS=/usr/local/root
+    export PATH=$ROOTSYS/bin:$PATH
+    export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+	
+Refresh source: 
+
+    source .bashrc
+  
+4- Installing FeniCS
+Getting the right repos for older FEniCS version:
+   
+    sudo add-apt-repository ppa:fenics-packages/fenics-1.5.x 
+    sudo apt-get update
+    sudo apt-get install -y fenics
+    sudo apt-get dist-upgrade
+    sudo apt-get install -y ipython-notebook
+    sudo apt-get install -y paraview
+    
+Cleaning Fenics ppa repositories:
+
+    sudo add-apt-repository --remove ppa:fenics-packages/fenics-1.5.x
+    sudo apt-get install ppa-purge
+    sudo ppa-purge ppa:fenics-packages/fenics-1.5.x (To be sure but redundant)
+    
+    
+5- Installing VTK and Qt4 libraries
+
+    sudo apt-get install libvtk5-dev python-vtk libvtk-java tcl-vtk libvtk5-qt4-dev
+   
+6- Install doxygen
+
+    sudo apt-get install doxygen
+
+7-  Setting up, compiling and executing TRACS in your home directory:
+
+    git clone https://github.com/JulesDoc/Tracs
+    cd TRACS/src  
+    ffc -l dolfin Poisson.ufl (Not necessary but recommended)
+    ffc -l dolfin Gradient.ufl (Not necessary but recommended)
+    cd ..
     mkdir build
     cd build
-    
-4) Configure CMake and create Makefile
-
-    cmake ..
-    
-5) Compile in a machine with [N] cores
-
-    make -j[N]
-    
-6) Move necessary files to the directory from which you will execute TRACS. eg.: TRACS/build/bin
-
-    mv ../src/files2move2bin/* ./bin/
-   
-7) Execute TRACS
-
+    cmake .. (Some warnings may appear, keep smiling)
+    make -j2 (or make -jN...depends on your Number of cores)
+    mv ../files2move2bin/* ./bin/
     cd bin/
     ./TRACS # for Command line version
     ./TRACS-GUI # for Grafical User Interface version
     ./interface_test # for the TRACS interface demo (CLI)
 
+   
 # Brief Introduction on How TRACS Works
 
   A summary of how TRACS functions can be found here. As a brief introduction it is meant for young padowams that have never seen TRACS before. More experienced users or anyone with some experience in C++11 or detector simulation might find it more useful to read the code and comments in folder TRACS/src/                                
