@@ -66,7 +66,7 @@ Cleaning Fenics ppa repositories:
 7-  Setting up, compiling and executing TRACS in your home directory:
 
     git clone https://github.com/JulesDoc/Tracs
-    cd TRACS/src  
+    cd Tracs/src  
     ffc -l dolfin Poisson.ufl (Not necessary but recommended)
     ffc -l dolfin Gradient.ufl (Not necessary but recommended)
     cd ..
